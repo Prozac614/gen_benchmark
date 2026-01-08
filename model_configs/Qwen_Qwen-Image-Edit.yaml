@@ -1,0 +1,33 @@
+# =============================================================================
+# Benchmark Configuration for Qwen/Qwen-Image-Edit
+# =============================================================================
+
+# === Test Cases (Workloads) ===
+cases:
+
+  # Image-to-Image/Image Editing test case
+  - id: "image_edit_test"
+    type: "image"
+    prompt: "Transform into anime style"
+    num_inference_steps: 30
+    height: 1024
+    width: 1024
+    image_path: "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/diffusers/cat.png"
+
+# === Evaluation Targets ===
+targets:
+  # Diffusers - Qwen Image Edit (Image Editing)
+  - name: "diffusers_qwen_image_edit"
+    engine_class: "DiffusersEngine"
+    type: "local"
+    task: "image"
+    model: "Qwen/Qwen-Image-Edit"
+    output_dir: "outputs"
+
+  # fal.ai - Qwen Image Edit (Image Editing)
+  - name: "fal_qwen_image_edit"
+    engine_class: "FalEngine"
+    type: "remote"
+    task: "image"
+    fal_model: "fal-ai/qwen-image-edit"
+    output_dir: "outputs"

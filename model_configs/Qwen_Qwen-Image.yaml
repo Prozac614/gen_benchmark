@@ -1,0 +1,31 @@
+# =============================================================================
+# Benchmark Configuration for Qwen/Qwen-Image
+# =============================================================================
+
+# === Test Cases (Workloads) ===
+cases:
+  # Text-to-Image test case
+  - id: "qwen_t2i_test"
+    type: "image"
+    prompt: "A futuristic cyberpunk city at night, neon lights reflecting on wet streets, highly detailed, 8k"
+    num_inference_steps: 30
+    height: 1024
+    width: 1024
+
+# === Evaluation Targets ===
+targets:
+  # diffusers - Qwen Image (Image Generation)
+  - name: "diffusers_qwen_image"
+    engine_class: "DiffusersEngine"
+    type: "local"
+    task: "image"
+    model: "Qwen/Qwen-Image"
+    output_dir: "outputs"
+
+  # fal.ai - Qwen Image (Image Generation)
+  - name: "fal_qwen_image"
+    engine_class: "FalEngine"
+    type: "remote"
+    task: "image"
+    fal_model: "fal-ai/qwen-image"
+    output_dir: "outputs"

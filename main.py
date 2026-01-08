@@ -1,0 +1,175 @@
+#!/usr/bin/env python3
+"""
+Benchmark runner for comparing generation performance across frameworks.
+"""
+
+import os
+import sys
+import json
+import argparse
+from datetime import datetime
+from typing import Dict, Any, List, Tuple
+
+import yaml
+import pandas as pd
+
+import engines
+from monitor import GPUMonitor
+
+
+def load_config(config_path: str) -> Dict[str, Any]:
+    """Load configuration from YAML file."""
+    with open(config_path, "r") as f:
+        return yaml.safe_load(f)
+
+
+def get_engine_class(engine_class_name: str):
+    """Dynamically get engine class by name."""
+    return getattr(engines, engine_class_name)
+
+
+def run_benchmark(config_path: str) -> Tuple[pd.DataFrame, str]:
+    """
+    Run the benchmark suite.
+
+    Args:
+        config_path: Path to config.yaml
+
+    Returns:
+        DataFrame with benchmark results
+    """
+    # Load configuration
+    print(f"Loading configuration from {config_path}...")
+    config = load_config(config_path)
+    
+    cases = config["cases"]
+    targets = config["targets"]
+    
+    results: List[Dict[str, Any]] = []
+    first_target_output_dir = None
+    
+    # Iterate over targets
+    for target in targets:
+        target_name = target["name"]
+        engine_class_name = target["engine_class"]
+        target_type = target.get("type", "local")
+        target_task = target.get("task", "image")
+        target_output_dir = target.get("output_dir", "outputs")
+        
+        # Record first target's output_dir for CSV saving
+        if first_target_output_dir is None:
+            first_target_output_dir = target_output_dir
+        
+        print(f"\n{'='*60}")
+        print(f"Loading Engine: {target_name}")
+        print(f"  Class: {engine_class_name}")
+        print(f"  Type: {target_type}")
+        print(f"  Task: {target_task}")
+        print(f"{'='*60}")
+        
+        try:
+            # Instantiate engine
+            EngineClass = get_engine_class(engine_class_name)
+            engine = EngineClass(target)
+            
+            # Load model
+            print("Loading model...")
+            engine.load()
+            print("Model loaded successfully.")
+            
+            # Filter cases by task type
+            matching_cases = [c for c in cases if c.get("type") == target_task]
+            
+            if not matching_cases:
+                print(f"  No matching cases for task type '{target_task}', skipping.")
+                engine.unload()
+                continue
+            
+            # Run each matching case
+            for case in matching_cases:
+                case_id = case["id"]
+                print(f"\n  Running Case: {case_id}")
+                print(f"    Prompt: {case['prompt'][:50]}...")
+                
+                # Determine if GPU monitoring should be enabled
+                is_local = target_type == "local"
+                
+                # Run generation with monitoring
+                with GPUMonitor(enabled=is_local) as monitor:
+                    metrics = engine.generate(case)
+                
+                # Record results
+                result = {
+                    "engine": target_name,
+                    "case_id": case_id,
+                    "task": target_task,
+                    "latency_seconds": round(metrics["latency"], 4),
+                    "peak_vram_mb": round(monitor.peak_vram_mb, 2) if is_local else "N/A",
+                    "output_path": metrics.get("output_path", "N/A"),
+                    "timestamp": datetime.now().isoformat(),
+                }
+                results.append(result)
+                
+                # Save individual metrics
+                metrics_path = os.path.join(
+                    target_output_dir, target_name, case_id, "metrics.json"
+                )
+                os.makedirs(os.path.dirname(metrics_path), exist_ok=True)
+                with open(metrics_path, "w") as f:
+                    json.dump(result, f, indent=2)
+                
+                print(f"    Latency: {result['latency_seconds']:.2f}s")
+                if is_local:
+                    print(f"    Peak VRAM: {result['peak_vram_mb']:.2f} MB")
+                print(f"    Output: {result['output_path']}")
+            
+            # Unload model
+            print(f"\nUnloading engine: {target_name}")
+            engine.unload()
+            
+        except Exception as e:
+            print(f"ERROR: Failed to run {target_name}: {e}")
+            raise  # Fast fail as per plan
+    
+    # Create results DataFrame
+    df = pd.DataFrame(results)
+    
+    # Use first target's output_dir for CSV saving (already set in loop)
+    if first_target_output_dir is None:
+        first_target_output_dir = "outputs"
+    
+    return df, first_target_output_dir
+
+
+def main():
+    """Main entry point."""
+    parser = argparse.ArgumentParser(
+        description="Benchmark runner for generation frameworks"
+    )
+    parser.add_argument(
+        "--config",
+        type=str,
+        default="config.yaml",
+        help="Path to configuration file (default: config.yaml)",
+    )
+    args = parser.parse_args()
+    
+    print("="*60)
+    print("  Generation Benchmark Runner")
+    print("="*60)
+    print(f"Config: {args.config}")
+    print()
+    
+    # Run benchmark
+    df, output_dir = run_benchmark(args.config)
+    
+    # Print results
+    print("\n" + "="*60)
+    print("  BENCHMARK RESULTS")
+    print("="*60 + "\n")
+    
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

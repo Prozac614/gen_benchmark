@@ -1,0 +1,40 @@
+# =============================================================================
+# Benchmark Configuration for black-forest-labs/FLUX.2-dev
+# =============================================================================
+
+# === Test Cases (Workloads) ===
+cases:
+  # Text-to-Image test case
+  - id: "flux_t2i_test"
+    type: "image"
+    prompt: "A futuristic cyberpunk city at night, neon lights reflecting on wet streets, highly detailed, 8k"
+    num_inference_steps: 30
+    height: 1024
+    width: 1024
+
+  # Image-to-Image/Image Editing test case
+  - id: "image_edit_test"
+    type: "image"
+    prompt: "Transform into anime style"
+    num_inference_steps: 30
+    height: 1024
+    width: 1024
+    image_path: "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/diffusers/cat.png"
+
+# === Evaluation Targets ===
+targets:
+  # Diffusers - FLUX.2-dev (Image Generation)
+  - name: "diffusers_flux2_dev"
+    engine_class: "DiffusersEngine"
+    type: "local"
+    task: "image"
+    model: "black-forest-labs/FLUX.2-dev"
+    output_dir: "outputs"
+
+  # fal.ai - FLUX.2-dev (Image Generation)
+  - name: "fal_flux2_dev"
+    engine_class: "FalEngine"
+    type: "remote"
+    task: "image"
+    fal_model: "fal-ai/flux-2"
+    output_dir: "outputs"

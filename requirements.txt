@@ -1,0 +1,20 @@
+# Core dependencies
+torch>=2.0.0
+diffusers>=0.30.0
+transformers>=4.40.0
+accelerate>=0.30.0
+pynvml>=11.5.0
+pandas>=2.0.0
+pyyaml>=6.0
+requests>=2.31.0
+pillow>=10.0.0
+imageio>=2.31.0
+imageio-ffmpeg>=0.4.9
+ftfy>=6.1.1
+fal-client>=0.5.0
+# SGLang
+
+openai>=1.0.0
+
+# LightX2V
+# lightx2v>=0.1.0  # Uncomment when available via pip, or install from source
