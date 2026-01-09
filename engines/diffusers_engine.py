@@ -108,13 +108,17 @@ class DiffusersEngine(BaseEngine):
             # Video generation
             num_frames = case.get("num_frames", 25)
             
-            output = self.pipe(
-                prompt=prompt,
-                num_inference_steps=num_inference_steps,
-                height=height,
-                width=width,
-                num_frames=num_frames,
-            )
+            pipe_kwargs = {
+                "prompt": prompt,
+                "num_inference_steps": num_inference_steps,
+                "height": height,
+                "width": width,
+                "num_frames": num_frames,
+            }
+            if image is not None:
+                pipe_kwargs["image"] = image
+            
+            output = self.pipe(**pipe_kwargs)
             
             # Save video
             output_filename = f"output_{timestamp}.mp4"
