@@ -70,6 +70,7 @@ class DiffusersEngine(BaseEngine):
         num_inference_steps = case.get("num_inference_steps", 30)
         height = case.get("height", 512)
         width = case.get("width", 512)
+        seed = case.get("seed", 42)
         
         # Load image if image_path is provided (for image editing tasks)
         image_path = case.get("image_path")
@@ -84,7 +85,7 @@ class DiffusersEngine(BaseEngine):
         
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         
-        start_time = time.time()
+        generator = torch.Generator(device="cuda").manual_seed(seed)
         
         if self.task == "image":
             # Image generation
@@ -93,11 +94,15 @@ class DiffusersEngine(BaseEngine):
                 "num_inference_steps": num_inference_steps,
                 "height": height,
                 "width": width,
+                "generator": generator,
             }
             if image is not None:
                 pipe_kwargs["image"] = image
             
+            start_time = time.time()
             output = self.pipe(**pipe_kwargs)
+            end_time = time.time()
+            latency = end_time - start_time
             
             # Save image
             output_filename = f"output_{timestamp}.png"
@@ -114,11 +119,15 @@ class DiffusersEngine(BaseEngine):
                 "height": height,
                 "width": width,
                 "num_frames": num_frames,
+                "generator": generator,
             }
             if image is not None:
                 pipe_kwargs["image"] = image
             
+            start_time = time.time()
             output = self.pipe(**pipe_kwargs)
+            end_time = time.time()
+            latency = end_time - start_time
             
             # Save video
             output_filename = f"output_{timestamp}.mp4"
@@ -128,9 +137,6 @@ class DiffusersEngine(BaseEngine):
             import imageio
             frames = output.frames[0]  # Get first batch
             imageio.mimwrite(output_path, frames, fps=8, quality=8)
-        
-        end_time = time.time()
-        latency = end_time - start_time
         
         return {
             "latency": latency,

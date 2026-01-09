@@ -13,6 +13,7 @@ cases:
     height: 1024
     width: 1024
     image_path: "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/diffusers/cat.png"
+    seed: 42
 
 # === Evaluation Targets ===
 targets:

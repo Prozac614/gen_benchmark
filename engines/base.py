@@ -29,7 +29,9 @@ class BaseEngine(ABC):
 
         Returns:
             Dict containing:
-                - latency: float (seconds)
+                - e2e_latency: float (seconds) - end-to-end total latency (for fal engine)
+                - inference_time: float (seconds) or "N/A" - pure inference time from API (for fal engine)
+                - latency: float (seconds) - general latency (for other engines)
                 - output_path: str (path to generated output)
         """
         raise NotImplementedError

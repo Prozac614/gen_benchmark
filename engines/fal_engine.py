@@ -34,10 +34,12 @@ class FalEngine(BaseEngine):
         prompt = case["prompt"]
         height = case.get("height", 512)
         width = case.get("width", 512)
+        seed = case.get("seed", 42)
         
         arguments = {
             "prompt": prompt,
             "image_size": {"width": width, "height": height},
+            "seed": seed,
         }
         
         # Add image_url if image_path exists
@@ -79,27 +81,17 @@ class FalEngine(BaseEngine):
         result = handler.get()
         end_time = time.time()
         
+        # Calculate end-to-end latency
+        e2e_latency = end_time - start_time
+        
         # Extract inference time from API response
         # Try timings.inference first (for synchronous requests)
         # Then try metrics.inference_time (for Queue API)
-        # Fallback to total elapsed time if neither is available
         inference_time = None
         if "timings" in result and isinstance(result.get("timings"), dict) and "inference" in result["timings"]:
             inference_time = result["timings"]["inference"]
         elif "metrics" in result and isinstance(result.get("metrics"), dict) and "inference_time" in result["metrics"]:
             inference_time = result["metrics"]["inference_time"]
-        
-        # Use inference time directly as latency (per user requirement: "inference直接当latency")
-        if inference_time is not None:
-            latency = inference_time
-        else:
-            # Fallback: use total elapsed time if inference time is not available
-            logging.warning(
-                f"[FalEngine] Unable to extract inference time from API response. "
-                f"Using total elapsed time ({end_time - start_time:.4f}s) as fallback. "
-                f"Response keys: {list(result.keys())}"
-            )
-            latency = end_time - start_time
         
         # Extract URL and download
         if self.task == "image":
@@ -113,7 +105,8 @@ class FalEngine(BaseEngine):
         self._download_file(result_url, output_path)
         
         return {
-            "latency": latency,
+            "e2e_latency": e2e_latency,
+            "inference_time": inference_time if inference_time is not None else "N/A",
             "output_path": output_path,
         }
 

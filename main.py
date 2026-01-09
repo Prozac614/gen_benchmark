@@ -110,11 +110,21 @@ def run_benchmark(config_path: str, target_names: Optional[List[str]] = None) ->
                     metrics = engine.generate(case)
                 
                 # Record results
+                # Handle both fal engine (e2e_latency, inference_time) and other engines (latency)
+                if "e2e_latency" in metrics:
+                    e2e_latency_seconds = round(metrics["e2e_latency"], 4) if isinstance(metrics["e2e_latency"], (int, float)) else metrics["e2e_latency"]
+                    inference_time_seconds = round(metrics["inference_time"], 4) if isinstance(metrics["inference_time"], (int, float)) else metrics["inference_time"]
+                else:
+                    # Backward compatibility for other engines
+                    e2e_latency_seconds = round(metrics["latency"], 4) if isinstance(metrics["latency"], (int, float)) else metrics["latency"]
+                    inference_time_seconds = "N/A"
+                
                 result = {
                     "engine": target_name,
                     "case_id": case_id,
                     "task": target_task,
-                    "latency_seconds": round(metrics["latency"], 4),
+                    "e2e_latency_seconds": e2e_latency_seconds,
+                    "inference_time_seconds": inference_time_seconds,
                     "peak_vram_mb": round(monitor.peak_vram_mb, 2) if is_local else "N/A",
                     "output_path": metrics.get("output_path", "N/A"),
                     "timestamp": datetime.now().isoformat(),
@@ -129,7 +139,10 @@ def run_benchmark(config_path: str, target_names: Optional[List[str]] = None) ->
                 with open(metrics_path, "w") as f:
                     json.dump(result, f, indent=2)
                 
-                print(f"    Latency: {result['latency_seconds']:.2f}s")
+                e2e_display = f"{result['e2e_latency_seconds']:.2f}s" if isinstance(result['e2e_latency_seconds'], (int, float)) else str(result['e2e_latency_seconds'])
+                inference_display = f"{result['inference_time_seconds']:.2f}s" if isinstance(result['inference_time_seconds'], (int, float)) else str(result['inference_time_seconds'])
+                print(f"    E2E Latency: {e2e_display}")
+                print(f"    Inference Time: {inference_display}")
                 if is_local:
                     print(f"    Peak VRAM: {result['peak_vram_mb']:.2f} MB")
                 print(f"    Output: {result['output_path']}")

@@ -12,6 +12,7 @@ cases:
     height: 480
     width: 832
     num_frames: 81
+    seed: 42
 
   # Image-to-Video test case
   - id: "i2v_test"
@@ -22,6 +23,7 @@ cases:
     width: 832
     num_frames: 81
     image_path: "https://huggingface.co/Wan-AI/Wan2.2-TI2V-5B-Diffusers/blob/main/examples/i2v_input.JPG"
+    seed: 42
 
 # === Evaluation Targets ===
 targets:

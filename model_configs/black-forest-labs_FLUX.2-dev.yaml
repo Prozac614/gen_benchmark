@@ -11,6 +11,7 @@ cases:
     num_inference_steps: 30
     height: 1024
     width: 1024
+    seed: 42
 
   # Image-to-Image/Image Editing test case
   - id: "image_edit_test"
@@ -20,6 +21,7 @@ cases:
     height: 1024
     width: 1024
     image_path: "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/diffusers/cat.png"
+    seed: 42
 
 # === Evaluation Targets ===
 targets:
