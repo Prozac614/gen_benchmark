@@ -22,10 +22,18 @@ targets:
     model: "Tongyi-MAI/Z-Image-Turbo"
     output_dir: "outputs"
 
-  # fal.ai - Z-Image-Turbo (Image Generation)
-  - name: "fal_z_image_turbo"
-    engine_class: "FalEngine"
+  # fal serverless - Z-Image-Turbo (Image Generation)
+  - name: "fal_serverless_z_image_turbo"
+    engine_class: "FalServerlessEngine"
     type: "remote"
     task: "image"
-    fal_model: "fal-ai/z-image/turbo"
+    fal_app_id: "YOUR_USERNAME/z-image-turbo"
     output_dir: "outputs"
+
+# fal serverless deployment config
+fal_serverless:
+  machine_type: "GPU-A100"
+  num_gpus: 1
+  keep_alive: 60
+  min_concurrency: 0
+  max_concurrency: 2

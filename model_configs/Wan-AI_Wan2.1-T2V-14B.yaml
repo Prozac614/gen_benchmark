@@ -23,6 +23,15 @@ targets:
     model: "Wan-AI/Wan2.1-T2V-14B-Diffusers"
     output_dir: "outputs"
 
+
+  # fal.ai - Wan (Video Generation)
+  - name: "fal_wan"
+    engine_class: "FalEngine"
+    type: "remote"
+    task: "video"
+    fal_model: "fal-ai/wan/v2.1-14b/text-to-video"
+    output_dir: "outputs"
+    
   # # LightX2V - Wan (Video Generation)
   # - name: "lightx2v_wan"
   #   engine_class: "LightX2VEngine"

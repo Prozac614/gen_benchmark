@@ -11,9 +11,11 @@ pillow>=10.0.0
 imageio>=2.31.0
 imageio-ffmpeg>=0.4.9
 ftfy>=6.1.1
-fal-client>=0.5.0
-# SGLang
 
+# fal.ai serverless
+fal>=0.1.0
+
+# SGLang
 openai>=1.0.0
 
 # LightX2V

@@ -23,3 +23,19 @@ targets:
     task: "video"
     model: "Wan-AI/Wan2.1-T2V-1.3B-Diffusers"
     output_dir: "outputs"
+
+  # fal serverless - Wan2.1 T2V 1.3B (Video Generation)
+  - name: "fal_serverless_wan21_t2v_1.3b"
+    engine_class: "FalServerlessEngine"
+    type: "remote"
+    task: "video"
+    fal_app_id: "YOUR_USERNAME/wan-t2v-1-3b"
+    output_dir: "outputs"
+
+# fal serverless deployment config
+fal_serverless:
+  machine_type: "GPU-A100"
+  num_gpus: 1
+  keep_alive: 60
+  min_concurrency: 0
+  max_concurrency: 2

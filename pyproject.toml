@@ -1,0 +1,13 @@
+[project]
+name = "gen-benchmark"
+version = "0.1.0"
+description = "Generation benchmark with fal serverless apps"
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic>=2.0",
+    "fal>=0.1.0",
+]
+
+[tool.fal.apps]
+z-image-turbo = "fal_apps.image.z_image_turbo:ZImageTurboApp"
+wan-t2v-1-3b = "fal_apps.video.wan_t2v_1_3b:WanT2V1_3BApp"
