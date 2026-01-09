@@ -1,5 +1,6 @@
 import os
 import time
+import logging
 import requests
 from datetime import datetime
 from typing import Dict, Any
@@ -78,7 +79,27 @@ class FalEngine(BaseEngine):
         result = handler.get()
         end_time = time.time()
         
-        latency = end_time - start_time
+        # Extract inference time from API response
+        # Try timings.inference first (for synchronous requests)
+        # Then try metrics.inference_time (for Queue API)
+        # Fallback to total elapsed time if neither is available
+        inference_time = None
+        if "timings" in result and isinstance(result.get("timings"), dict) and "inference" in result["timings"]:
+            inference_time = result["timings"]["inference"]
+        elif "metrics" in result and isinstance(result.get("metrics"), dict) and "inference_time" in result["metrics"]:
+            inference_time = result["metrics"]["inference_time"]
+        
+        # Use inference time directly as latency (per user requirement: "inference直接当latency")
+        if inference_time is not None:
+            latency = inference_time
+        else:
+            # Fallback: use total elapsed time if inference time is not available
+            logging.warning(
+                f"[FalEngine] Unable to extract inference time from API response. "
+                f"Using total elapsed time ({end_time - start_time:.4f}s) as fallback. "
+                f"Response keys: {list(result.keys())}"
+            )
+            latency = end_time - start_time
         
         # Extract URL and download
         if self.task == "image":
