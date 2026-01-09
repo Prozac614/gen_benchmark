@@ -8,7 +8,7 @@ import sys
 import json
 import argparse
 from datetime import datetime
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Tuple, Optional
 
 import yaml
 import pandas as pd
@@ -28,12 +28,13 @@ def get_engine_class(engine_class_name: str):
     return getattr(engines, engine_class_name)
 
 
-def run_benchmark(config_path: str) -> Tuple[pd.DataFrame, str]:
+def run_benchmark(config_path: str, target_names: Optional[List[str]] = None) -> Tuple[pd.DataFrame, str]:
     """
     Run the benchmark suite.
 
     Args:
         config_path: Path to config.yaml
+        target_names: Optional list of target names to filter. If None or empty, runs all targets.
 
     Returns:
         DataFrame with benchmark results
@@ -44,6 +45,14 @@ def run_benchmark(config_path: str) -> Tuple[pd.DataFrame, str]:
     
     cases = config["cases"]
     targets = config["targets"]
+    
+    # Filter targets if target_names is provided
+    if target_names is not None and len(target_names) > 0:
+        available_target_names = [t["name"] for t in targets]
+        targets = [t for t in targets if t["name"] in target_names]
+        missing_targets = [name for name in target_names if name not in available_target_names]
+        if missing_targets:
+            print(f"WARNING: The following target names were not found in config: {', '.join(missing_targets)}")
     
     results: List[Dict[str, Any]] = []
     first_target_output_dir = None
@@ -152,6 +161,13 @@ def main():
         default="config.yaml",
         help="Path to configuration file (default: config.yaml)",
     )
+    parser.add_argument(
+        "--targets",
+        type=str,
+        nargs="*",
+        default=None,
+        help="Filter targets by name. Can specify multiple names. If not provided, runs all targets.",
+    )
     args = parser.parse_args()
     
     print("="*60)
@@ -161,7 +177,7 @@ def main():
     print()
     
     # Run benchmark
-    df, output_dir = run_benchmark(args.config)
+    df, output_dir = run_benchmark(args.config, target_names=args.targets)
     
     # Print results
     print("\n" + "="*60)
