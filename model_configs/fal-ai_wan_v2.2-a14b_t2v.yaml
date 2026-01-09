@@ -1,0 +1,26 @@
+# =============================================================================
+# Benchmark Configuration for fal-ai/wan/v2.2-a14b/text-to-video
+# =============================================================================
+
+# === Test Cases (Workloads) ===
+cases:
+  # Text-to-Video test case
+  - id: "wan_v22_a14b_t2v_test"
+    type: "video"
+    prompt: "A close-up of a young woman smiling gently in the rain, raindrops glistening on her face and eyelashes. The video captures the delicate details of her expression and the water droplets, with soft light reflecting off her skin in the rainy atmosphere."
+    num_frames: 20
+    frames_per_second: 8
+    resolution: "720p"
+    aspect_ratio: "16:9"
+    num_inference_steps: 20 
+    video_quality: "high"
+
+# === Evaluation Targets ===
+targets:
+  # fal.ai - Wan v2.2 A14B (Text-to-Video)
+  - name: "fal_wan_v22_a14b_t2v"
+    engine_class: "FalEngine"
+    type: "remote"
+    task: "video"
+    fal_model: "fal-ai/wan/v2.2-a14b/text-to-video"
+    output_dir: "outputs"

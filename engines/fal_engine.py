@@ -23,6 +23,27 @@ class FalEngine(BaseEngine):
         """No operation for API-based engine."""
         pass
 
+    # Optional parameters supported for video generation APIs
+    VIDEO_OPTIONAL_PARAMS = [
+        "num_inference_steps",
+        "num_frames",
+        "frames_per_second",
+        "resolution",
+        "aspect_ratio",
+        "enable_safety_checker",
+        "enable_output_safety_checker",
+        "enable_prompt_expansion",
+        "acceleration",
+        "guidance_scale",
+        "guidance_scale_2",
+        "shift",
+        "interpolator_model",
+        "num_interpolated_frames",
+        "adjust_fps_for_interpolation",
+        "video_quality",
+        "video_write_mode",
+    ]
+
     def _get_endpoint(self, case: Dict[str, Any]) -> str:
         """Determine the appropriate fal.ai endpoint based on case."""
         if self.task == "video" and case.get("image_path") and self.fal_model_i2v:
@@ -32,23 +53,32 @@ class FalEngine(BaseEngine):
     def _build_arguments(self, case: Dict[str, Any]) -> Dict[str, Any]:
         """Build arguments dict for fal.ai API call."""
         prompt = case["prompt"]
-        height = case.get("height", 512)
-        width = case.get("width", 512)
-        seed = case.get("seed", 42)
         
-        arguments = {
-            "prompt": prompt,
-            "image_size": {"width": width, "height": height},
-            "seed": seed,
-        }
+        # Initialize arguments with prompt
+        arguments = {"prompt": prompt}
+        
+        # Handle image size: use resolution if provided, otherwise use width/height
+        if case.get("resolution"):
+            # Use resolution and aspect_ratio for video APIs (e.g., fal-ai/wan)
+            pass  # resolution will be added via VIDEO_OPTIONAL_PARAMS loop
+        else:
+            # Use traditional width/height for image APIs
+            height = case.get("height", 512)
+            width = case.get("width", 512)
+            arguments["image_size"] = {"width": width, "height": height}
+        
+        # Add seed if provided
+        if case.get("seed") is not None:
+            arguments["seed"] = case["seed"]
         
         # Add image_url if image_path exists
         if case.get("image_path"):
             arguments["image_url"] = case["image_path"]
         
-        # Add num_inference_steps if exists
-        if case.get("num_inference_steps"):
-            arguments["num_inference_steps"] = case["num_inference_steps"]
+        # Add all optional video parameters if they exist in case
+        for param in self.VIDEO_OPTIONAL_PARAMS:
+            if param in case and case[param] is not None:
+                arguments[param] = case[param]
         
         return arguments
 
@@ -76,22 +106,23 @@ class FalEngine(BaseEngine):
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         
         # Call fal.ai API
+        inference_time = None
+        def on_queue_update(status):
+            nonlocal inference_time
+            if hasattr(status, 'metrics') and status.metrics:
+                inference_time = status.metrics.get("inference_time")
+
         start_time = time.time()
-        handler = fal_client.submit(endpoint, arguments=arguments)
-        result = handler.get()
+        result = fal_client.subscribe(
+            endpoint,
+            arguments=arguments,
+            on_queue_update=on_queue_update
+        )
         end_time = time.time()
         
         # Calculate end-to-end latency
         e2e_latency = end_time - start_time
         
-        # Extract inference time from API response
-        # Try timings.inference first (for synchronous requests)
-        # Then try metrics.inference_time (for Queue API)
-        inference_time = None
-        if "timings" in result and isinstance(result.get("timings"), dict) and "inference" in result["timings"]:
-            inference_time = result["timings"]["inference"]
-        elif "metrics" in result and isinstance(result.get("metrics"), dict) and "inference_time" in result["metrics"]:
-            inference_time = result["metrics"]["inference_time"]
         
         # Extract URL and download
         if self.task == "image":
