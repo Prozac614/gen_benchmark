@@ -10,6 +10,8 @@ import argparse
 from datetime import datetime
 from typing import Dict, Any, List, Tuple, Optional
 
+from dotenv import load_dotenv
+
 import yaml
 import pandas as pd
 
@@ -152,6 +154,7 @@ def run_benchmark(config_path: str, target_names: Optional[List[str]] = None) ->
 
 def main():
     """Main entry point."""
+    load_dotenv()
     parser = argparse.ArgumentParser(
         description="Benchmark runner for generation frameworks"
     )
