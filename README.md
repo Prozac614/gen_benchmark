@@ -1,7 +1,3 @@
-Here is the English translation of the README. Per your request, emojis have been removed, and the status sections use standard Markdown checkboxes.
-
----
-
 # Generation Benchmark Framework
 
 Automated Benchmarking Framework for Inference Acceleration
