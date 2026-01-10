@@ -7,13 +7,23 @@ cases:
   # Text-to-Video test case
   - id: "wan_v22_a14b_t2v_test"
     type: "video"
-    prompt: "A close-up of a young woman smiling gently in the rain, raindrops glistening on her face and eyelashes. The video captures the delicate details of her expression and the water droplets, with soft light reflecting off her skin in the rainy atmosphere."
-    num_frames: 20
-    frames_per_second: 8
-    resolution: "720p"
+    prompt: "A cat and a dog baking a cake together in a kitchen. The cat is carefully measuring flour, while the dog is stirring the batter with a wooden spoon. The kitchen is cozy, with sunlight streaming through the window."
+    num_frames: 81
+    frames_per_second: 16
+    resolution: "480p"
     aspect_ratio: "16:9"
-    num_inference_steps: 20 
+    num_inference_steps: 40 
+    guidance_scale: 5.0
+    guidance_scale_2: 5.0
     video_quality: "high"
+    seed: 42
+    interpolator_model: none
+    acceleration: none
+    enable_safety_checker: true
+    enable_output_safety_checker: false
+    enable_prompt_expansion: false
+    video_quality: high
+    video_write_mode: balanced
 
 # === Evaluation Targets ===
 targets:

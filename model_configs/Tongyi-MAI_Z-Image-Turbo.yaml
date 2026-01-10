@@ -7,8 +7,8 @@ cases:
   # Text-to-Image test case
   - id: "tongyi_t2i_test"
     type: "image"
-    prompt: "A futuristic cyberpunk city at night, neon lights reflecting on wet streets, highly detailed, 8k"
-    num_inference_steps: 30
+    prompt: "A fantasy landscape with mountains and a river, detailed, vibrant colors"
+    num_inference_steps: 9
     height: 1024
     width: 1024
     seed: 42
@@ -16,12 +16,12 @@ cases:
 # === Evaluation Targets ===
 targets:
   # DiffusersEngine - Z-Image-Turbo (Image Generation)
-  - name: "diffusers_z_image_turbo"
-    engine_class: "DiffusersEngine"
-    type: "local"
-    task: "image"
-    model: "Tongyi-MAI/Z-Image-Turbo"
-    output_dir: "outputs"
+  # - name: "diffusers_z_image_turbo"
+  #   engine_class: "DiffusersEngine"
+  #   type: "local"
+  #   task: "image"
+  #   model: "Tongyi-MAI/Z-Image-Turbo"
+  #   output_dir: "outputs"
 
   # fal.ai - Z-Image-Turbo (Image Generation)
   - name: "fal_z_image_turbo"
