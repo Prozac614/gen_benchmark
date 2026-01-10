@@ -1,0 +1,30 @@
+# =============================================================================
+# Benchmark Configuration for fal-ai/wan/v2.2-a14b/text-to-video
+# =============================================================================
+
+# === Test Cases (Workloads) ===
+cases:
+  # Text-to-Video test case
+  - id: "wan_v22_5b_i2v_test"
+    type: "video"
+    prompt: "An astronaut hatching from an egg, on the surface of the moon, the darkness and depth of space realised in the background. High quality, ultrarealistic detail and breath-taking movie-like camera shot."
+    negative_prompt: "Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards"
+    num_inference_steps: 50 
+    guidance_scale: 5.0
+    interpolator_model: none
+
+    num_frames: 81
+    resolution: "580p"
+    aspect_ratio: "16:9"
+    
+    seed: 42
+    image_url: "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/diffusers/astronaut.jpg"
+
+# === Evaluation Targets ===
+targets:
+  - name: "fal_wan_v22_5b_i2v"
+    engine_class: "FalEngine"
+    type: "remote"
+    task: "video"
+    fal_model: "fal-ai/wan/v2.2-5b/image-to-video"
+    output_dir: "outputs"

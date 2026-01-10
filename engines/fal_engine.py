@@ -26,6 +26,7 @@ class FalEngine(BaseEngine):
     # Optional parameters supported for video generation APIs
     VIDEO_OPTIONAL_PARAMS = [
         "num_inference_steps",
+        "negative_prompt",
         "num_frames",
         "frames_per_second",
         "resolution",
@@ -46,7 +47,7 @@ class FalEngine(BaseEngine):
 
     def _get_endpoint(self, case: Dict[str, Any]) -> str:
         """Determine the appropriate fal.ai endpoint based on case."""
-        if self.task == "video" and case.get("image_path") and self.fal_model_i2v:
+        if self.task == "video" and case.get("image_url") and self.fal_model_i2v:
             return self.fal_model_i2v
         return self.fal_model
 
@@ -71,13 +72,16 @@ class FalEngine(BaseEngine):
         if case.get("seed") is not None:
             arguments["seed"] = case["seed"]
         
-        # Add image_url if image_path exists
-        if case.get("image_path"):
-            arguments["image_url"] = case["image_path"]
+        # Add image_url if image_url exists
+        if case.get("image_url"):
+            arguments["image_url"] = case["image_url"]
         
-        # Add all optional video parameters if they exist in case
+        # Add negative_prompt with default empty string
+        arguments["negative_prompt"] = case.get("negative_prompt", "")
+        
+        # Add all optional video parameters if they exist in case (exclude negative_prompt as it's handled separately with default value)
         for param in self.VIDEO_OPTIONAL_PARAMS:
-            if param in case and case[param] is not None:
+            if param != "negative_prompt" and param in case and case[param] is not None:
                 arguments[param] = case[param]
         
         return arguments

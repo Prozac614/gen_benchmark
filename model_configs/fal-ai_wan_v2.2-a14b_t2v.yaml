@@ -15,13 +15,9 @@ cases:
     num_inference_steps: 40 
     guidance_scale: 5.0
     guidance_scale_2: 5.0
-    video_quality: "high"
     seed: 42
     interpolator_model: none
-    acceleration: none
-    enable_safety_checker: true
-    enable_output_safety_checker: false
-    enable_prompt_expansion: false
+    acceleration: regular
     video_quality: high
     video_write_mode: balanced
 
