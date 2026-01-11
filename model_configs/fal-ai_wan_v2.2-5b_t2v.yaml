@@ -9,8 +9,7 @@ cases:
     type: "video"
     prompt: "A cat and a dog baking a cake together in a kitchen. The cat is carefully measuring flour, while the dog is stirring the batter with a wooden spoon. The kitchen is cozy, with sunlight streaming through the window."
     num_frames: 81
-    frames_per_second: 16
-    resolution: "480p"
+    resolution: "580p"
     aspect_ratio: "16:9"
     num_inference_steps: 50 
     guidance_scale: 5.0
@@ -28,5 +27,5 @@ targets:
     engine_class: "FalEngine"
     type: "remote"
     task: "video"
-    fal_model: "fal-ai/wan/v2.2-a14b/text-to-video"
+    fal_model: "fal-ai/wan/v2.2-5b/text-to-video"
     output_dir: "outputs"
