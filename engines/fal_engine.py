@@ -16,8 +16,9 @@ class FalEngine(BaseEngine):
     def __init__(self, config: Dict[str, Any]):
         super().__init__(config)
         self.task = config.get("task", "image")
-        self.fal_model = config["fal_model"]
-        self.fal_model_i2v = config.get("fal_model_i2v")
+        self.params = config.get("params") or {}
+        self.fal_model = self.params["fal_model"]
+        self.fal_model_i2v = self.params.get("fal_model_i2v")
 
     def load(self) -> None:
         """No operation for API-based engine."""
@@ -46,39 +47,41 @@ class FalEngine(BaseEngine):
 
     def _get_endpoint(self, case: Dict[str, Any]) -> str:
         """Determine the appropriate fal.ai endpoint based on case."""
-        if self.task == "video" and case.get("image_path") and self.fal_model_i2v:
+        case_params = case.get("params") or {}
+        if self.task == "video" and case_params.get("image_path") and self.fal_model_i2v:
             return self.fal_model_i2v
         return self.fal_model
 
     def _build_arguments(self, case: Dict[str, Any]) -> Dict[str, Any]:
         """Build arguments dict for fal.ai API call."""
         prompt = case["prompt"]
+        case_params = case.get("params") or {}
         
         # Initialize arguments with prompt
         arguments = {"prompt": prompt}
         
         # Handle image size: use resolution if provided, otherwise use width/height
-        if case.get("resolution"):
+        if case_params.get("resolution"):
             # Use resolution and aspect_ratio for video APIs (e.g., fal-ai/wan)
             pass  # resolution will be added via VIDEO_OPTIONAL_PARAMS loop
         else:
             # Use traditional width/height for image APIs
-            height = case.get("height", 512)
-            width = case.get("width", 512)
+            height = case_params.get("height", 512)
+            width = case_params.get("width", 512)
             arguments["image_size"] = {"width": width, "height": height}
         
         # Add seed if provided
-        if case.get("seed") is not None:
-            arguments["seed"] = case["seed"]
+        if case_params.get("seed") is not None:
+            arguments["seed"] = case_params["seed"]
         
         # Add image_url if image_path exists
-        if case.get("image_path"):
-            arguments["image_url"] = case["image_path"]
+        if case_params.get("image_path"):
+            arguments["image_url"] = case_params["image_path"]
         
         # Add all optional video parameters if they exist in case
         for param in self.VIDEO_OPTIONAL_PARAMS:
-            if param in case and case[param] is not None:
-                arguments[param] = case[param]
+            if param in case_params and case_params[param] is not None:
+                arguments[param] = case_params[param]
         
         return arguments
 

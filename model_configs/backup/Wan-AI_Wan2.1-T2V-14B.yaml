@@ -6,8 +6,9 @@
 cases:
   # Text-to-Video test case
   - id: "wan_t2v_test"
-    type: "video"
     prompt: "A serene mountain landscape with flowing clouds, cinematic drone shot, golden hour lighting"
+    task: "video"
+    params:
     num_inference_steps: 30
     height: 480
     width: 832
@@ -21,8 +22,9 @@ targets:
     engine_class: "DiffusersEngine"
     type: "local"
     task: "video"
-    model: "Wan-AI/Wan2.1-T2V-14B-Diffusers"
     output_dir: "outputs"
+    params:
+      model: "Wan-AI/Wan2.1-T2V-14B-Diffusers"
 
   # # LightX2V - Wan (Video Generation)
   # - name: "lightx2v_wan"

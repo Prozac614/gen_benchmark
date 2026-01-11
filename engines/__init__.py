@@ -1,13 +1,23 @@
-from .base import BaseEngine
-from .diffusers_engine import DiffusersEngine
-from .fal_engine import FalEngine
-# from .sglang_engine import SGLangEngine
-# from .lightx2v_engine import LightX2VEngine
+from __future__ import annotations
 
-__all__ = [
-    "BaseEngine",
-    "DiffusersEngine",
-    "FalEngine",
-    # "SGLangEngine",
-    # "LightX2VEngine",
-]
+import importlib
+from typing import Dict
+
+from .base import BaseEngine
+
+_ENGINE_CLASS_TO_MODULE: Dict[str, str] = {
+    "DiffusersEngine": ".diffusers_engine",
+    "FalEngine": ".fal_engine",
+    "SGLangEngine": ".sglang_engine",
+    "LightX2VEngine": ".lightx2v_engine",
+}
+
+__all__ = ["BaseEngine", *_ENGINE_CLASS_TO_MODULE.keys()]
+
+
+def __getattr__(name: str):
+    module_rel = _ENGINE_CLASS_TO_MODULE.get(name)
+    if module_rel is None:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    module = importlib.import_module(module_rel, __name__)
+    return getattr(module, name)

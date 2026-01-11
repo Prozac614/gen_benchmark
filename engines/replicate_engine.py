@@ -14,7 +14,8 @@ class ReplicateEngine(BaseEngine):
     def __init__(self, config: Dict[str, Any]):
         super().__init__(config)
         self.task = config.get("task", "image")
-        self.replicate_model = config["replicate_model"]
+        self.params = config.get("params") or {}
+        self.replicate_model = self.params["replicate_model"]
 
     def load(self) -> None:
         """No operation for API-based engine."""
@@ -23,9 +24,10 @@ class ReplicateEngine(BaseEngine):
     def _build_input(self, case: Dict[str, Any]) -> Dict[str, Any]:
         """Build input dict for Replicate API call."""
         prompt = case["prompt"]
-        height = case.get("height", 512)
-        width = case.get("width", 512)
-        seed = case.get("seed", 42)
+        case_params = case.get("params") or {}
+        height = case_params.get("height", 512)
+        width = case_params.get("width", 512)
+        seed = case_params.get("seed", 42)
         
         input_dict = {
             "prompt": prompt,
@@ -35,16 +37,16 @@ class ReplicateEngine(BaseEngine):
         }
         
         # Add num_inference_steps if exists
-        if case.get("num_inference_steps"):
-            input_dict["num_inference_steps"] = case["num_inference_steps"]
+        if case_params.get("num_inference_steps"):
+            input_dict["num_inference_steps"] = case_params["num_inference_steps"]
         
         # Add num_frames for video tasks if exists
-        if self.task == "video" and case.get("num_frames"):
-            input_dict["num_frames"] = case["num_frames"]
+        if self.task == "video" and case_params.get("num_frames"):
+            input_dict["num_frames"] = case_params["num_frames"]
         
         # Add image if image_path exists
-        if case.get("image_path"):
-            image_path = case["image_path"]
+        if case_params.get("image_path"):
+            image_path = case_params["image_path"]
             # Check if it's a URL or local file
             if image_path.startswith("http://") or image_path.startswith("https://"):
                 # URL: pass as string

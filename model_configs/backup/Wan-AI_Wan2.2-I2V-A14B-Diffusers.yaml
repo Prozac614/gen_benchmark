@@ -7,8 +7,9 @@ cases:
 
   # Image-to-Video test case
   - id: "i2v_test"
-    type: "video"
     prompt: "The girl turn the body and spin around in place"
+    task: "video"
+    params:
     num_inference_steps: 4
     height: 480
     width: 832
@@ -23,13 +24,15 @@ targets:
     engine_class: "DiffusersEngine"
     type: "local"
     task: "video"
-    model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
     output_dir: "outputs"
+    params:
+      model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
 
   # fal.ai - Wan2.2 I2V A14B (Image-to-Video)
   - name: "fal_wan22_i2v_a14b"
     engine_class: "FalEngine"
     type: "remote"
     task: "video"
-    fal_model: "fal-ai/wan/v2.2-a14b/image-to-video"
     output_dir: "outputs"
+    params:
+      fal_model: "fal-ai/wan/v2.2-a14b/image-to-video"

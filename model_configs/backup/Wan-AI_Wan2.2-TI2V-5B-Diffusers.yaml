@@ -1,0 +1,60 @@
+# =============================================================================
+# Benchmark Configuration for Wan-AI/Wan2.2-TI2V-5B-Diffusers
+# =============================================================================
+
+# === Test Cases (Workloads) ===
+cases:
+  # Text-to-Video test case
+  - id: "wan_t2v_test"
+    prompt: "A cat and a dog baking a cake together in a kitchen. The cat is carefully measuring flour, while the dog is stirring the batter with a wooden spoon. The kitchen is cozy, with sunlight streaming through the window."
+    task: "video"
+    params:
+      num_inference_steps: 50
+      num_frames: 81
+      seed: 42
+      resolution: "580p"
+      aspect_ratio: "16:9"
+      acceleration: "regular"
+      guidance_scale: 5
+      guidance_scale_2: 5
+      interpolator_model: "none"
+      video_quality: "high"
+      video_write_mode: "balanced"
+
+  # Image-to-Video test case
+  - id: "i2v_test"
+    prompt: "An astronaut hatching from an egg, on the surface of the moon, the darkness and depth of space realised in the background. High quality, ultrarealistic detail and breath-taking movie-like camera shot."
+    task: "video"
+    params:
+      num_inference_steps: 50
+      num_frames: 81
+      image_path: "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/diffusers/astronaut.jpg"
+      seed: 42
+      resolution: "580p"
+      aspect_ratio: "16:9"
+      guidance_scale: 5
+      interpolator_model: "none"
+      video_quality: "high"
+      video_write_mode: "balanced"
+      negative_prompt: "Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards"
+
+# === Evaluation Targets ===
+targets:
+  # DiffusersEngine - Wan2.2 TI2V 5B (Text-to-Video)
+  - name: "diffusers_wan22_ti2v_5b"
+    engine_class: "DiffusersEngine"
+    type: "local"
+    task: "video"
+    output_dir: "outputs"
+    params:
+      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
+
+  # fal.ai - Wan2.2 TI2V 5B (Text-to-Video and Image-to-Video)
+  - name: "fal_wan22_ti2v_5b"
+    engine_class: "FalEngine"
+    type: "remote"
+    task: "video"
+    output_dir: "outputs"
+    params:
+      fal_model: "fal-ai/wan/v2.2-5b/text-to-video"
+      fal_model_i2v: "fal-ai/wan/v2.2-5b/image-to-video"

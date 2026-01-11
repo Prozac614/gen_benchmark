@@ -2,41 +2,52 @@
 # Benchmark Configuration for black-forest-labs/FLUX.2-dev
 # =============================================================================
 
+defaults:
+  case:
+    params:
+      num_inference_steps: 50
+      height: 1024
+      width: 1024
+      seed: 42
+  target:
+    output_dir: "outputs"
+    params: {}
+
 # === Test Cases (Workloads) ===
 cases:
   # Text-to-Image test case
   - id: "flux_t2i_test"
-    type: "image"
     prompt: "A futuristic cyberpunk city at night, neon lights reflecting on wet streets, highly detailed, 8k"
-    num_inference_steps: 30
-    height: 1024
-    width: 1024
-    seed: 42
+    task: "image"
 
   # Image-to-Image/Image Editing test case
   - id: "image_edit_test"
-    type: "image"
     prompt: "Transform into anime style"
-    num_inference_steps: 30
-    height: 1024
-    width: 1024
+    task: "image"
+    params:
     image_path: "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/diffusers/cat.png"
-    seed: 42
 
 # === Evaluation Targets ===
 targets:
-  # Diffusers - FLUX.2-dev (Image Generation)
-  - name: "diffusers_flux2_dev"
+  diffusers:
     engine_class: "DiffusersEngine"
     type: "local"
     task: "image"
-    model: "black-forest-labs/FLUX.2-dev"
-    output_dir: "outputs"
+    params:
+      model: "black-forest-labs/FLUX.2-dev"
 
-  # fal.ai - FLUX.2-dev (Image Generation)
-  - name: "fal_flux2_dev"
+  sglang:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "image"
+    params:
+    model: "black-forest-labs/FLUX.2-dev"
+      num_gpus: 1
+
+  # NOTE: `sm` is treated as a remote backend here (Fal.ai).
+  sm:
     engine_class: "FalEngine"
     type: "remote"
     task: "image"
+    params:
     fal_model: "fal-ai/flux-2"
-    output_dir: "outputs"

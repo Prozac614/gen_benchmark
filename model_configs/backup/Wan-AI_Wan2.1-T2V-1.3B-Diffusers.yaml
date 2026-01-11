@@ -6,21 +6,23 @@
 cases:
   # Text-to-Video test case
   - id: "wan_t2v_test"
-    type: "video"
     prompt: "A serene mountain landscape with flowing clouds, cinematic drone shot, golden hour lighting"
-    num_inference_steps: 30
-    height: 480
-    width: 832
-    num_frames: 81
-    seed: 42
+    task: "video"
+    params:
+      num_inference_steps: 30
+      height: 480
+      width: 832
+      num_frames: 81
+      seed: 42
 
 
 # === Evaluation Targets ===
 targets:
   # DiffusersEngine - Wan2.1 T2V 1.3B (Video Generation)
-  - name: "diffusers_wan21_t2v_1.3b"
+  - name: "c d_wan21_t2v_1.3b"
     engine_class: "DiffusersEngine"
     type: "local"
     task: "video"
-    model: "Wan-AI/Wan2.1-T2V-1.3B-Diffusers"
     output_dir: "outputs"
+    params:
+      model: "Wan-AI/Wan2.1-T2V-1.3B-Diffusers"

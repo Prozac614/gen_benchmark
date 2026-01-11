@@ -1,0 +1,51 @@
+defaults:
+  target:
+    output_dir: "outputs"
+    params: {}
+
+targets:
+  lightx2v_qwen_2512:
+    engine_class: "LightX2VEngine"
+    type: "local"
+    task: "text-to-image"
+    case_ids: ["qwen_2512_t2i"]
+    params:
+      model_path: "/workspace/hf_cache/hub/models--Qwen--Qwen-Image-2512/snapshots/25468b98e3276ca6700de15c6628e51b7de54a26"
+      model_cls: "qwen_image"
+      task: "t2i"
+      config_json: "../LightX2V/configs/qwen_image/qwen_image_t2i_2512.json"
+
+  lightx2v_qwen_edit_2511:
+    engine_class: "LightX2VEngine"
+    type: "local"
+    task: "image-to-image"
+    case_ids: ["qwen_2511_edit"]
+    params:
+      model_path: "/workspace/hf_cache/hub/models--Qwen--Qwen-Image-Edit-2511/snapshots/6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9"
+      model_cls: "qwen_image"
+      task: "i2i"
+      config_json: "../LightX2V/configs/qwen_image/qwen_image_i2i_2511.json"
+
+  lightx2v_wan22_i2v_5b:
+    engine_class: "LightX2VEngine"
+    type: "local"
+    task: "image-to-video"
+    case_ids: ["wan22_5b_i2v"]
+    params:
+      # NOT the Diffusers repo variant. Use: Wan-AI/Wan2.2-TI2V-5B
+      model_path: "/workspace/hf_cache/hub/models--Wan-AI--Wan2.2-TI2V-5B/snapshots/current"
+      model_cls: "wan2.2"
+      task: "i2v"
+      config_json: "../LightX2V/configs/wan22/wan_ti2v_i2v.json"
+
+  lightx2v_wan22_t2v_5b:
+    engine_class: "LightX2VEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_5b_t2v"]
+    params:
+      # NOT the Diffusers repo variant. Use: Wan-AI/Wan2.2-TI2V-5B
+      model_path: "/workspace/hf_cache/hub/models--Wan-AI--Wan2.2-TI2V-5B/snapshots/current"
+      model_cls: "wan2.2"
+      task: "t2v"
+      config_json: "../LightX2V/configs/wan22/wan_ti2v_t2v.json"

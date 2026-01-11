@@ -1,13 +1,14 @@
 # =============================================================================
-# Benchmark Configuration for black-forest-labs/FLUX.1-schnell
+# Benchmark Configuration for black-forest-labs/FLUX.1-dev
 # =============================================================================
 
 # === Test Cases (Workloads) ===
 cases:
   # Text-to-Image test case
   - id: "flux_t2i_test"
-    type: "image"
     prompt: "A futuristic cyberpunk city at night, neon lights reflecting on wet streets, highly detailed, 8k"
+    task: "image"
+    params:
     num_inference_steps: 30
     height: 1024
     width: 1024
@@ -15,8 +16,9 @@ cases:
 
   # Image-to-Image/Image Editing test case
   - id: "image_edit_test"
-    type: "image"
     prompt: "Transform into anime style"
+    task: "image"
+    params:
     num_inference_steps: 30
     height: 1024
     width: 1024
@@ -25,18 +27,28 @@ cases:
 
 # === Evaluation Targets ===
 targets:
-  # Diffusers - Flux (Image Generation)
-  - name: "diffusers_flux"
-    engine_class: "DiffusersEngine"
-    type: "local"
-    task: "image"
-    model: "black-forest-labs/FLUX.1-schnell"
-    output_dir: "outputs"
-
-  # # SGLang - Flux (Image Generation)
-  # - name: "sglang_flux_schnell"
+  # SGLang - FLUX.1-dev (Image Generation)
+  # - name: "sglang_flux1_dev"
   #   engine_class: "SGLangEngine"
   #   type: "local"
   #   task: "image"
-  #   model: "black-forest-labs/FLUX.1-schnell"
+  #   model: "black-forest-labs/FLUX.1-dev"
   #   output_dir: "outputs"
+
+  # Diffusers - FLUX.1-dev (Image Generation)
+  - name: "diffusers_flux1_dev"
+    engine_class: "DiffusersEngine"
+    type: "local"
+    task: "image"
+    output_dir: "outputs"
+    params:
+      model: "black-forest-labs/FLUX.1-dev"
+
+  # fal.ai - FLUX.1-dev (Image Generation)
+  - name: "fal_flux1_dev"
+    engine_class: "FalEngine"
+    type: "remote"
+    task: "image"
+    output_dir: "outputs"
+    params:
+      fal_model: "fal-ai/flux/dev"

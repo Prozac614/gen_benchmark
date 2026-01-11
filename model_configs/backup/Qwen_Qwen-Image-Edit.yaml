@@ -1,0 +1,49 @@
+# =============================================================================
+# Benchmark Configuration for Qwen/Qwen-Image-Edit
+# =============================================================================
+
+defaults:
+  case:
+    params:
+      num_inference_steps: 50
+      height: 1024
+      width: 1024
+      seed: 42
+  target:
+    output_dir: "outputs"
+    params: {}
+
+# === Test Cases (Workloads) ===
+cases:
+
+  # Image-to-Image/Image Editing test case
+  - id: "image_edit_test"
+    task: "image"
+    prompt: "Transform into anime style"
+    params:
+      image_urls: "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/diffusers/cat.png"
+
+# === Evaluation Targets ===
+targets:
+  diffusers:
+    engine_class: "DiffusersEngine"
+    type: "local"
+    task: "image"
+    params:
+      model: "Qwen/Qwen-Image-Edit-2511"
+
+  sglang:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "image"
+    params:
+      model: "Qwen/Qwen-Image-Edit-2511"
+      num_gpus: 1
+
+  # NOTE: `sm` is treated as a remote backend here (Fal.ai).
+  sm:
+    engine_class: "FalEngine"
+    type: "remote"
+    task: "image"
+    params:
+      fal_model: "fal-ai/qwen-image-edit-2511"
