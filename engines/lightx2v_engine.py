@@ -510,9 +510,6 @@ class LightX2VEngine(BaseEngine):
                 if "num_inference_steps" in case_params:
                     steps = int(case_params["num_inference_steps"])
                     self.pipe.infer_steps = steps
-                    runner = getattr(self.pipe, "runner", None)
-                    if runner is not None and hasattr(runner, "config"):
-                        runner.config["infer_steps"] = steps
                 if "height" in case_params:
                     self.pipe.target_height = int(case_params["height"])
                 if "width" in case_params:
@@ -529,10 +526,6 @@ class LightX2VEngine(BaseEngine):
                 if "aspect_ratio" in case_params:
                     ar = str(case_params["aspect_ratio"])
                     self.pipe.aspect_ratio = ar
-                    runner = getattr(self.pipe, "runner", None)
-                    if runner is not None and hasattr(runner, "config"):
-                        runner.config["aspect_ratio"] = ar
-
                 if str(self.model_cls or "") == "qwen_image":
                     cs = case_params.get("custom_shape")
                     if isinstance(cs, (list, tuple)) and len(cs) == 2:

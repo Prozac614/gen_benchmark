@@ -50,7 +50,7 @@ python setup.py install
 Run all targets defined in a config file:
 
 ```bash
-export CUDA_VISIBLE_DEVICES=0
+export CUDA_VISIBLE_DEVICES=1
 python main.py --config model_configs/benchmark_all_local.yaml
 ```
 

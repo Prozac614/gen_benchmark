@@ -94,7 +94,8 @@ cases:
     params:
       height: 1024
       width: 1024
-      guidance_scale: 3.5
+      guidance_scale: 4.0
+      aspect_ratio: "1:1"
 
   # # ------------------------------ Flux 2 Edit (I2I) --------------------------------
   # - id: "flux2_edit"
