@@ -76,6 +76,7 @@ if [ -d "$WORKSPACE_DIR/flash-attention/hopper" ]; then
     python setup.py install
     cd "$WORKSPACE_DIR/flash-attention"
     python setup.py install
+    export PYTHONPATH="$WORKSPACE_DIR/flash-attention/hopper:$PYTHONPATH"
 else
     echo "Warning: $WORKSPACE_DIR/flash-attention not found. Skipping FlashAttention installation."
 fi
