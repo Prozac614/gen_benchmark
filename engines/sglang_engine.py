@@ -22,6 +22,11 @@ class SGLangEngine(BaseEngine):
 
     def load(self) -> None:
         if self.generator is None:
+            env_vars = self.params.get("env", {})
+            for k, v in env_vars.items():
+                os.environ[str(k)] = str(v)
+                print(f"Set env var: {k}={v}")
+
             server_args = dict(self.server_args)
             server_args.setdefault("model_path", self.model)
             server_args.setdefault("num_gpus", self.num_gpus)

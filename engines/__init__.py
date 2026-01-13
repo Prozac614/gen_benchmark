@@ -10,6 +10,7 @@ _ENGINE_CLASS_TO_MODULE: Dict[str, str] = {
     "FalEngine": ".fal_engine",
     "SGLangEngine": ".sglang_engine",
     "LightX2VEngine": ".lightx2v_engine",
+    "VllmOmniEngine": ".vllm_omni_engine",
 }
 
 __all__ = ["BaseEngine", *_ENGINE_CLASS_TO_MODULE.keys()]

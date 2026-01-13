@@ -1,0 +1,99 @@
+defaults:
+  target:
+    output_dir: "outputs"
+    params: {}
+  case:
+    params:
+      repeats: 5
+  
+  sglang_common: &sglang_common
+    num_gpus: 1
+    server_args:
+      warmup: false
+      log_level: "error"
+
+targets:
+  sglang_qwen_2512:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "text-to-image"
+    case_ids: ["qwen_2512_t2i"]
+    params:
+      model: "Qwen/Qwen-Image-2512"
+      <<: *sglang_common
+
+  sglang_qwen_edit_2511:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "image-to-image"
+    case_ids: ["qwen_2511_edit"]
+    params:
+      model: "Qwen/Qwen-Image-Edit-2511"
+      <<: *sglang_common
+
+  # Cache-DiT variant for Qwen
+  sglang_qwen_edit_2511_cachedit:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "image-to-image"
+    case_ids: ["qwen_2511_edit"]
+    params:
+      model: "Qwen/Qwen-Image-Edit-2511"
+      <<: *sglang_common
+      env:
+        SGLANG_CACHE_DIT_ENABLED: "true"
+
+  sglang_wan22_i2v_5b:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "image-to-video"
+    case_ids: ["wan22_5b_i2v"]
+    params:
+      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
+      <<: *sglang_common
+
+  sglang_wan22_t2v_5b:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_5b_t2v"]
+    params:
+      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
+      <<: *sglang_common
+
+  # Cache-DiT variant for Wan
+  sglang_wan22_t2v_5b_cachedit:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_5b_t2v"]
+    params:
+      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
+      <<: *sglang_common
+      env:
+        SGLANG_CACHE_DIT_ENABLED: "true"
+
+  # sglang_flux2:
+  #   engine_class: "SGLangEngine"
+  #   type: "local"
+  #   task: "text-to-image"
+  #   case_ids: ["flux2_t2i"]
+  #   params:
+  #     model: "black-forest-labs/FLUX.2-dev"
+  #     # Cannot use anchor because we need to extend server_args
+  #     num_gpus: 1
+  #     server_args:
+  #       warmup: false
+  #       log_level: "error"
+  #       dit_cpu_offload: true
+  #       text_encoder_cpu_offload: true
+  #       vae_cpu_offload: true
+
+  sglang_zimage:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "text-to-image"
+    case_ids: ["zimage_turbo_t2i"]
+    params:
+      model: "Tongyi-MAI/Z-Image-Turbo"
+      <<: *sglang_common

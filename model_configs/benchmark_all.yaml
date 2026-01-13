@@ -1,0 +1,12 @@
+includes:
+  - _fragments/cases_common.yaml
+  - _fragments/targets_sglang.yaml
+  - _fragments/targets_lightx2v.yaml
+  - _fragments/targets_diffusers.yaml
+  - _fragments/targets_vllm.yaml
+
+defaults:
+  target:
+    output_dir: "outputs"
+    params: {}
+targets: []

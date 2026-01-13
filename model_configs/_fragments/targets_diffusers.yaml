@@ -79,13 +79,14 @@ targets:
   #   params:
   #     model: "black-forest-labs/FLUX.1-Fill-dev"
 
-  diffusers_flux2_dev:
+  diffusers_flux2:
     engine_class: "DiffusersEngine"
     type: "local"
     task: "text-to-image"
     case_ids: ["flux2_t2i"]
     params:
       model: "black-forest-labs/FLUX.2-dev"
+      cpu_offload: true
 
   # -----------------------------------------------------------------------------
   # Z-Image

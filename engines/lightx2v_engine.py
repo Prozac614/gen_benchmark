@@ -536,6 +536,39 @@ class LightX2VEngine(BaseEngine):
                         if isinstance(h, int) and isinstance(w, int):
                             self.pipe.custom_shape = [h, w]
 
+            # lightx2v.utils.input_info.set_input_info() expects pipeline.target_shape to exist.
+            if not hasattr(self.pipe, "target_shape") or getattr(self.pipe, "target_shape", None) in (None, ""):
+                ts = None
+                # Prefer custom_shape when present (Qwen uses it for exact sizes).
+                cs = getattr(self.pipe, "custom_shape", None)
+                if isinstance(cs, (list, tuple)) and len(cs) == 2:
+                    try:
+                        ts = [int(cs[0]), int(cs[1])]
+                    except Exception:
+                        ts = None
+                if ts is None:
+                    try:
+                        h = int(getattr(self.pipe, "target_height", 0) or 0)
+                        w = int(getattr(self.pipe, "target_width", 0) or 0)
+                        if h > 0 and w > 0:
+                            ts = [h, w]
+                    except Exception:
+                        ts = None
+                if ts is None:
+                    # Last resort: take from case params.
+                    try:
+                        h = int(case_params.get("height") or 0)
+                        w = int(case_params.get("width") or 0)
+                        if h > 0 and w > 0:
+                            ts = [h, w]
+                    except Exception:
+                        ts = None
+                if ts is not None:
+                    try:
+                        setattr(self.pipe, "target_shape", ts)
+                    except Exception:
+                        pass
+
             self.pipe.generate(
                 seed=case_params.get("seed", 42),
                 prompt=prompt,

@@ -1,6 +1,6 @@
 includes:
   - _fragments/cases_common.yaml
-  - _fragments/targets_diffusers_all.yaml
+  - _fragments/targets_vllm.yaml
 
 defaults:
   target:

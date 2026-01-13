@@ -1,6 +1,6 @@
 includes:
   - _fragments/cases_common.yaml
-  - _fragments/targets_sglang_all.yaml
+  - _fragments/targets_lightx2v.yaml
 
 defaults:
   target:

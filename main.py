@@ -10,12 +10,9 @@ import argparse
 from datetime import datetime
 from typing import Dict, Any, List, Tuple, Optional
 import re
-
 from dotenv import load_dotenv
-
 import yaml
 import pandas as pd
-
 import engines
 from monitor import GPUMonitor
 
@@ -464,6 +461,7 @@ def run_benchmark(config_path: str, target_names: Optional[List[str]] = None) ->
 def main():
     """Main entry point."""
     load_dotenv()
+    os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
     parser = argparse.ArgumentParser(
         description="Benchmark runner for generation frameworks"
     )
