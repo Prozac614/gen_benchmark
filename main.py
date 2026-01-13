@@ -243,6 +243,55 @@ def _infer_model_id(target: Dict[str, Any], framework: str) -> str:
         return name[len(framework) + 1 :]
     return str(name)
 
+def _truthy_env_value(v: Any) -> bool:
+    if v is None:
+        return False
+    if isinstance(v, bool):
+        return v
+    if isinstance(v, (int, float)):
+        return v != 0
+    s = str(v).strip().lower()
+    return s not in ("", "0", "false", "no", "off", "none")
+
+
+def _infer_cache_tag(target: Dict[str, Any]) -> str:
+    """
+    Infer an output directory tag for cache acceleration variants so outputs don't mix.
+
+    Examples:
+    - vLLM-Omni: params.cache_backend in {cache_dit, tea_cache}
+    - SGLang: params.env.SGLANG_CACHE_DIT_ENABLED=true
+    """
+    params = target.get("params") or {}
+    if not isinstance(params, dict):
+        return ""
+
+    # vLLM-Omni style
+    cache_backend = params.get("cache_backend")
+    if isinstance(cache_backend, str) and cache_backend.strip():
+        cb = cache_backend.strip().lower()
+        if cb in ("cache_dit", "cache-dit"):
+            return "__cache_dit"
+        if cb in ("tea_cache", "tea-cache"):
+            return "__tea_cache"
+        return f"__{_slugify(cb)}"
+
+    # SGLang style env var toggle
+    env_vars = params.get("env") or {}
+    if isinstance(env_vars, dict) and _truthy_env_value(env_vars.get("SGLANG_CACHE_DIT_ENABLED")):
+        return "__cache_dit"
+
+    # Fallback: if target name already encodes it, mirror it for readability
+    name = target.get("name") or ""
+    if isinstance(name, str):
+        ln = name.lower()
+        if "cachedit" in ln or "cache_dit" in ln:
+            return "__cache_dit"
+        if "tea_cache" in ln or "teacache" in ln:
+            return "__tea_cache"
+
+    return ""
+
 
 def _case_dir_from_output_path(output_path: str) -> str:
     if not output_path or output_path == "N/A":
@@ -339,7 +388,8 @@ def run_benchmark(config_path: str, target_names: Optional[List[str]] = None) ->
 
         framework = _infer_framework(target)
         model_id = _infer_model_id(target, framework)
-        model_slug = _slugify(model_id)
+        cache_tag = _infer_cache_tag(target)
+        model_slug = _slugify(model_id) + cache_tag
         frameworks_seen.add(framework)
 
         target_output_dir = os.path.join(output_base_dir, framework, model_slug)

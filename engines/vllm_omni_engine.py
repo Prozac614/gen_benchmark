@@ -112,6 +112,15 @@ class VllmOmniEngine(BaseEngine):
         self.task = config.get("task", "text-to-video")
 
     def load(self) -> None:
+        env_vars = (self.params.get("env") or {}) if isinstance(self.params, dict) else {}
+        if env_vars:
+            if not isinstance(env_vars, dict):
+                raise TypeError(f"target.params.env must be a dict, got {type(env_vars)}")
+            for k, v in env_vars.items():
+                os.environ[str(k)] = str(v)
+            if "DIFFUSION_ATTENTION_BACKEND" in env_vars:
+                print(f"DIFFUSION_ATTENTION_BACKEND={os.environ.get('DIFFUSION_ATTENTION_BACKEND')}")
+
         try:
             from vllm_omni.entrypoints.omni import Omni
         except ImportError:

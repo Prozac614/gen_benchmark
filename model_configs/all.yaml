@@ -1,0 +1,7 @@
+includes:
+  - cases.yaml
+  - targets_sglang.yaml
+  - targets_lightx2v.yaml
+  - targets_diffusers.yaml
+  - targets_vllm.yaml
+

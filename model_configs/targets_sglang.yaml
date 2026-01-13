@@ -1,0 +1,200 @@
+defaults:
+  sglang_common: &sglang_common
+    num_gpus: 1
+    server_args:
+      warmup: false
+      log_level: "error"
+
+targets:
+  sglang_qwen_2512:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "text-to-image"
+    case_ids: ["qwen_2512_t2i"]
+    params:
+      model: "Qwen/Qwen-Image-2512"
+      <<: *sglang_common
+      
+  sglang_qwen_2512_cachedit:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "text-to-image"
+    case_ids: ["qwen_2512_t2i"]
+    params:
+      model: "Qwen/Qwen-Image-2512"
+      <<: *sglang_common
+      env:
+        SGLANG_CACHE_DIT_ENABLED: "true"
+        SGLANG_CACHE_DIT_FN: "1"
+        SGLANG_CACHE_DIT_BN: "0"
+        SGLANG_CACHE_DIT_WARMUP: "4"
+        SGLANG_CACHE_DIT_RDT: "0.24"
+        SGLANG_CACHE_DIT_MC: "3"
+        SGLANG_CACHE_DIT_TAYLORSEER: "false"
+        SGLANG_CACHE_DIT_TS_ORDER: "1"
+        SGLANG_CACHE_DIT_SCM_PRESET: "none"
+        SGLANG_CACHE_DIT_SCM_POLICY: "dynamic"
+
+  sglang_qwen_edit_2511:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "image-to-image"
+    case_ids: ["qwen_2511_edit"]
+    params:
+      model: "Qwen/Qwen-Image-Edit-2511"
+      <<: *sglang_common
+  sglang_qwen_edit_2511_cachedit:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "image-to-image"
+    case_ids: ["qwen_2511_edit"]
+    params:
+      model: "Qwen/Qwen-Image-Edit-2511"
+      <<: *sglang_common
+      env:
+        SGLANG_CACHE_DIT_ENABLED: "true"
+        SGLANG_CACHE_DIT_FN: "1"
+        SGLANG_CACHE_DIT_BN: "0"
+        SGLANG_CACHE_DIT_WARMUP: "4"
+        SGLANG_CACHE_DIT_RDT: "0.24"
+        SGLANG_CACHE_DIT_MC: "3"
+        SGLANG_CACHE_DIT_TAYLORSEER: "false"
+        SGLANG_CACHE_DIT_TS_ORDER: "1"
+        SGLANG_CACHE_DIT_SCM_PRESET: "none"
+        SGLANG_CACHE_DIT_SCM_POLICY: "dynamic"
+
+  sglang_zimage:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "text-to-image"
+    case_ids: ["zimage_turbo_t2i"]
+    params:
+      model: "Tongyi-MAI/Z-Image-Turbo"
+      <<: *sglang_common
+  sglang_zimage_cachedit:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "text-to-image"
+    case_ids: ["zimage_turbo_t2i"]
+    params:
+      model: "Tongyi-MAI/Z-Image-Turbo"
+      <<: *sglang_common
+      env:
+        SGLANG_CACHE_DIT_ENABLED: "true"
+        SGLANG_CACHE_DIT_FN: "1"
+        SGLANG_CACHE_DIT_BN: "0"
+        SGLANG_CACHE_DIT_WARMUP: "4"
+        SGLANG_CACHE_DIT_RDT: "0.24"
+        SGLANG_CACHE_DIT_MC: "3"
+        SGLANG_CACHE_DIT_TAYLORSEER: "false"
+        SGLANG_CACHE_DIT_TS_ORDER: "1"
+        SGLANG_CACHE_DIT_SCM_PRESET: "none"
+        SGLANG_CACHE_DIT_SCM_POLICY: "dynamic"
+
+  sglang_flux2:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "text-to-image"
+    case_ids: ["flux2_t2i"]
+    params:
+      model: "black-forest-labs/FLUX.2-dev"
+      <<: *sglang_common
+  sglang_flux2_cachedit:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "text-to-image"
+    case_ids: ["flux2_t2i"]
+    params:
+      model: "black-forest-labs/FLUX.2-dev"
+      <<: *sglang_common
+      env:
+        SGLANG_CACHE_DIT_ENABLED: "true"
+        SGLANG_CACHE_DIT_FN: "1"
+        SGLANG_CACHE_DIT_BN: "0"
+        SGLANG_CACHE_DIT_WARMUP: "4"
+        SGLANG_CACHE_DIT_RDT: "0.24"
+        SGLANG_CACHE_DIT_MC: "3"
+        SGLANG_CACHE_DIT_TAYLORSEER: "false"
+        SGLANG_CACHE_DIT_TS_ORDER: "1"
+        SGLANG_CACHE_DIT_SCM_PRESET: "none"
+        SGLANG_CACHE_DIT_SCM_POLICY: "dynamic"
+
+  sglang_wan22_t2v_5b:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_5b_t2v"]
+    params:
+      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
+      <<: *sglang_common
+      # Disable default auto-enable for Wan
+      server_args:
+        warmup: false
+        log_level: "error"
+        dit_layerwise_offload: false
+  
+  sglang_wan22_t2v_5b_cachedit:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_5b_t2v"]
+    params:
+      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
+      <<: *sglang_common
+      # Disable default auto-enable for Wan
+      server_args:
+        warmup: false
+        log_level: "error"
+        dit_layerwise_offload: false
+      env:
+        SGLANG_CACHE_DIT_ENABLED: "true"
+        SGLANG_CACHE_DIT_FN: "1"
+        SGLANG_CACHE_DIT_BN: "0"
+        SGLANG_CACHE_DIT_WARMUP: "4"
+        SGLANG_CACHE_DIT_RDT: "0.24"
+        SGLANG_CACHE_DIT_MC: "3"
+        SGLANG_CACHE_DIT_TAYLORSEER: "false"
+        SGLANG_CACHE_DIT_TS_ORDER: "1"
+        SGLANG_CACHE_DIT_SCM_PRESET: "none"
+        SGLANG_CACHE_DIT_SCM_POLICY: "dynamic"
+        # secondary transformer (Wan experts)
+        SGLANG_CACHE_DIT_SECONDARY_FN: "1"
+        SGLANG_CACHE_DIT_SECONDARY_BN: "0"
+        SGLANG_CACHE_DIT_SECONDARY_WARMUP: "4"
+        SGLANG_CACHE_DIT_SECONDARY_RDT: "0.24"
+        SGLANG_CACHE_DIT_SECONDARY_MC: "3"
+        SGLANG_CACHE_DIT_SECONDARY_TAYLORSEER: "false"
+        SGLANG_CACHE_DIT_SECONDARY_TS_ORDER: "1"
+
+  sglang_wan22_i2v_5b_cachedit:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "image-to-video"
+    case_ids: ["wan22_5b_i2v"]
+    params:
+      model: "Wan-AI/Wan2.2-I2V-5B-Diffusers"
+      <<: *sglang_common
+      # Disable default auto-enable for Wan
+      server_args:
+        warmup: false
+        log_level: "error"
+        dit_layerwise_offload: false
+      env:
+        SGLANG_CACHE_DIT_ENABLED: "true"
+        SGLANG_CACHE_DIT_FN: "1"
+        SGLANG_CACHE_DIT_BN: "0"
+        SGLANG_CACHE_DIT_WARMUP: "4"
+        SGLANG_CACHE_DIT_RDT: "0.24"
+        SGLANG_CACHE_DIT_MC: "3"
+        SGLANG_CACHE_DIT_TAYLORSEER: "false"
+        SGLANG_CACHE_DIT_TS_ORDER: "1"
+        SGLANG_CACHE_DIT_SCM_PRESET: "none"
+        SGLANG_CACHE_DIT_SCM_POLICY: "dynamic"
+        # secondary transformer (Wan experts)
+        SGLANG_CACHE_DIT_SECONDARY_FN: "1"
+        SGLANG_CACHE_DIT_SECONDARY_BN: "0"
+        SGLANG_CACHE_DIT_SECONDARY_WARMUP: "4"
+        SGLANG_CACHE_DIT_SECONDARY_RDT: "0.24"
+        SGLANG_CACHE_DIT_SECONDARY_MC: "3"
+        SGLANG_CACHE_DIT_SECONDARY_TAYLORSEER: "false"
+        SGLANG_CACHE_DIT_SECONDARY_TS_ORDER: "1"
