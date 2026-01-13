@@ -214,6 +214,35 @@ class LightX2VEngine(BaseEngine):
         case_params = case.get("params") or {}
         prompt = case["prompt"]
 
+        def _desired_hw_from_case() -> tuple[int, int] | None:
+            cs = case_params.get("custom_shape")
+            if isinstance(cs, (list, tuple)) and len(cs) == 2:
+                try:
+                    h, w = int(cs[0]), int(cs[1])
+                    if h > 0 and w > 0:
+                        return h, w
+                except Exception:
+                    pass
+
+            # Parse height/width if present
+            h = case_params.get("height")
+            w = case_params.get("width")
+            try:
+                hh = int(h) if h is not None else 0
+                ww = int(w) if w is not None else 0
+            except Exception:
+                hh, ww = 0, 0
+
+            ar = str(case_params.get("aspect_ratio") or "").strip()
+            if ar in ("1:1", "1/1", "1x1"):
+                side = max(hh, ww)
+                if side > 0:
+                    return side, side
+
+            if hh > 0 and ww > 0:
+                return hh, ww
+            return None
+
         # Decide output suffix from task (LightX2V supports both image + video tasks).
         ext = "png" if self.task in ("t2i", "i2i") else "mp4"
         run_id = self.config.get("_run_id") or time.strftime("%Y%m%d_%H%M%S")
@@ -339,11 +368,11 @@ class LightX2VEngine(BaseEngine):
             if mode in ("", "none", "off", "false", "0"):
                 return image_path
 
-            cs = case_params.get("custom_shape")
-            if not (isinstance(cs, (list, tuple)) and len(cs) == 2):
-                return image_path
             try:
-                th, tw = int(cs[0]), int(cs[1])
+                hw = _desired_hw_from_case()
+                if not hw:
+                    return image_path
+                th, tw = int(hw[0]), int(hw[1])
             except Exception:
                 return image_path
             if th <= 0 or tw <= 0:
@@ -452,14 +481,16 @@ class LightX2VEngine(BaseEngine):
                     ar = str(case_params["aspect_ratio"])
                     self.pipe.aspect_ratio = ar
                 if str(self.model_cls or "") == "qwen_image":
-                    cs = case_params.get("custom_shape")
-                    if isinstance(cs, (list, tuple)) and len(cs) == 2:
-                        self.pipe.custom_shape = [int(cs[0]), int(cs[1])]
-                    else:
-                        h = case_params.get("height")
-                        w = case_params.get("width")
-                        if isinstance(h, int) and isinstance(w, int):
-                            self.pipe.custom_shape = [h, w]
+                    # Force consistent H/W decision for Qwen (esp. i2i with aspect_ratio=1:1)
+                    hw = _desired_hw_from_case()
+                    if hw:
+                        self.pipe.custom_shape = [int(hw[0]), int(hw[1])]
+                        # Keep these in sync in case downstream reads target_height/target_width.
+                        try:
+                            self.pipe.target_height = int(hw[0])
+                            self.pipe.target_width = int(hw[1])
+                        except Exception:
+                            pass
 
             # lightx2v.utils.input_info.set_input_info() expects pipeline.target_shape to exist.
             if not hasattr(self.pipe, "target_shape") or getattr(self.pipe, "target_shape", None) in (None, ""):

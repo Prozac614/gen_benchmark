@@ -45,7 +45,7 @@ cases:
       negative_prompt: "Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards"
       num_frames: 81
       guidance_scale: 5.0
-      height: 704
+      height: 700
       width: 1280
 
   # ------------------------------ Wan 2.2 TI2V-5B (T2V) ----------------------------
@@ -56,7 +56,7 @@ cases:
       negative_prompt: " " # SGLang's Wan pipeline rejects empty-string negative_prompt.
       num_frames: 81
       guidance_scale: 5.0
-      height: 704
+      height: 700
       width: 1280
 
   # ------------------------------ Wan 2.2 T2V-A14B (480p / 720p) ------------------
@@ -77,7 +77,7 @@ cases:
       negative_prompt: " "
       num_frames: 81
       guidance_scale: 5.0
-      height: 704
+      height: 700
       width: 1280
 
   # ------------------------------ Wan 2.2 I2V-A14B (480p / 720p) ------------------
@@ -100,7 +100,7 @@ cases:
       negative_prompt: "Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards"
       num_frames: 81
       guidance_scale: 5.0
-      height: 704
+      height: 700
       width: 1280
 
   # ------------------------------ Wan 2.1 T2V-1.3B (T2V) ---------------------------
@@ -119,7 +119,7 @@ cases:
     task: "text-to-video"
     params:
       num_frames: 81
-      height: 704
+      height: 700
       width: 1280
       num_inference_steps: 30
 
@@ -130,7 +130,7 @@ cases:
     params:
       image_path: "figs/cyberpunk_city.jpg"
       num_frames: 81
-      height: 704
+      height: 700
       width: 1280
       num_inference_steps: 30
 
