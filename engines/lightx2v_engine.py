@@ -15,7 +15,6 @@ except ImportError:
 
 from .base import BaseEngine
 
-_WAN_TRITON_PATCHED = False
 _LIGHTX2V_SET_INPUT_INFO_PATCHED = False
 
 def _patch_lightx2v_set_input_info_once() -> None:
@@ -45,76 +44,6 @@ def _patch_lightx2v_set_input_info_once() -> None:
 
     input_info_mod.set_input_info = patched_set_input_info
     _LIGHTX2V_SET_INPUT_INFO_PATCHED = True
-
-def _patch_wan_triton_ops_once() -> None:
-    # Observed failure: Target sizes: [B, L, C] e.g. [1, 26350, 3072] Tensor sizes: [L, B, C] e.g. [26350, 1, 3072]
-    global _WAN_TRITON_PATCHED
-    if _WAN_TRITON_PATCHED:
-        return
-    try:
-        from lightx2v.models.networks.wan.infer import triton_ops as wan_triton_ops  # type: ignore
-        from lightx2v.models.networks.wan.infer import transformer_infer as wan_transformer_infer  # type: ignore
-    except Exception:
-        return
-
-    orig = getattr(wan_triton_ops, "fuse_scale_shift_kernel", None)
-    if orig is None:
-        return
-
-    def _torch_fallback(x: torch.Tensor, scale: torch.Tensor, shift: torch.Tensor) -> torch.Tensor:
-        if x.dim() == 2:
-            x = x.unsqueeze(0)
-        B, L, C = x.shape
-
-        def _to_blc(t: torch.Tensor) -> torch.Tensor:
-            if t.dim() == 0 or (t.dim() == 1 and t.numel() == 1):
-                return t.reshape(1, 1, 1)
-            if t.dim() == 2:
-                return t[:, None, :]
-            return t
-
-        scale_blc = _to_blc(scale)
-        shift_blc = _to_blc(shift)
-
-        if scale_blc.dim() == 3 and scale_blc.shape[0] == L and scale_blc.shape[1] == B:
-            scale_blc = scale_blc.permute(1, 0, 2).contiguous()
-        if shift_blc.dim() == 3 and shift_blc.shape[0] == L and shift_blc.shape[1] == B:
-            shift_blc = shift_blc.permute(1, 0, 2).contiguous()
-
-        if scale_blc.dim() == 3:
-            scale_exp = scale_blc.expand(B, L, C)
-        else:
-            scale_exp = scale_blc
-        if shift_blc.dim() == 3:
-            shift_exp = shift_blc.expand(B, L, C)
-        else:
-            shift_exp = shift_blc
-
-        return x * (1 + scale_exp) + shift_exp
-
-    def patched(x: torch.Tensor, scale: torch.Tensor, shift: torch.Tensor, *args, **kwargs):
-        try:
-            x_in = x.unsqueeze(0) if x.dim() == 2 else x
-            B, L, C = x_in.shape
-
-            def _maybe_fix(t: torch.Tensor) -> torch.Tensor:
-                if t.dim() == 3 and t.shape[0] == L and t.shape[1] == B:
-                    return t.permute(1, 0, 2).contiguous()
-                return t
-
-            return orig(x, _maybe_fix(scale), _maybe_fix(shift), *args, **kwargs)
-        except RuntimeError:
-            return _torch_fallback(x, scale, shift)
-
-    wan_triton_ops.fuse_scale_shift_kernel = patched
-    # Patch the cached import in transformer_infer as well
-    try:
-        wan_transformer_infer.fuse_scale_shift_kernel = patched
-        # If modulate_func already bound to the old symbol at init time, newly created
-        # instances will pick up the patched symbol via the module attribute above.
-    except Exception:
-        pass
-    _WAN_TRITON_PATCHED = True
 
 def _resolve_hf_cache_snapshot_path(model_path: str) -> str:
     if not model_path:
@@ -169,10 +98,6 @@ class LightX2VEngine(BaseEngine):
 
         from lightx2v import LightX2VPipeline 
         _patch_lightx2v_set_input_info_once()
-
-        # Patch Wan triton op early to avoid known shape issues for TI2V-5B.
-        if str(self.model_cls or "").startswith("wan") or str(self.model_cls or "") in ("wan2.1", "wan2.2"):
-            _patch_wan_triton_ops_once()
 
         resolved = _resolve_hf_cache_snapshot_path(self.model_path)
         if resolved != self.model_path:

@@ -49,7 +49,27 @@ fi
 
 pip install -v git+https://github.com/huggingface/diffusers.git
 pip install -v git+https://github.com/vipshop/cache-dit.git
-pip install -v git+https://github.com/ModelTC/LightX2V.git --no-deps
+
+LIGHTX2V_DIR="$WORKSPACE_DIR/LightX2V"
+LIGHTX2V_REPO_URL="https://github.com/RubiaCx/LightX2V.git"
+LIGHTX2V_BRANCH="fix"
+
+if [ -d "$LIGHTX2V_DIR/.git" ]; then
+    echo "Found local LightX2V repo at $LIGHTX2V_DIR"
+else
+    if [ -d "$LIGHTX2V_DIR" ]; then
+        echo "Warning: $LIGHTX2V_DIR exists but is not a git repo; will reuse it as-is."
+    else
+        echo "Cloning LightX2V ($LIGHTX2V_BRANCH) into $LIGHTX2V_DIR ..."
+        git clone --depth 1 --branch "$LIGHTX2V_BRANCH" "$LIGHTX2V_REPO_URL" "$LIGHTX2V_DIR"
+    fi
+fi
+
+echo "Installing LightX2V (editable, no-deps) ..."
+cd "$LIGHTX2V_DIR"
+pip install -e . --no-deps
+cd - >/dev/null
+
 echo "Installing vllm-omni..."
 pip install vllm==0.12.0 --no-deps
 pip install git+https://github.com/vllm-project/vllm-omni.git@ef01223c42be10ee260b9f6e5ec31894cd09d86e --no-deps
