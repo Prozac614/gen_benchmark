@@ -15,14 +15,14 @@ targets:
     params:
       model: "Qwen/Qwen-Image-Edit-2511"
 
-  diffusers_flux2:
-    engine_class: "DiffusersEngine"
-    type: "local"
-    task: "text-to-image"
-    case_ids: ["flux2_t2i"]
-    params:
-      model: "black-forest-labs/FLUX.2-dev"
-      cpu_offload: true
+  # diffusers_flux2:
+  #   engine_class: "DiffusersEngine"
+  #   type: "local"
+  #   task: "text-to-image"
+  #   case_ids: ["flux2_t2i"]
+  #   params:
+  #     model: "black-forest-labs/FLUX.2-dev"
+  #     cpu_offload: true
 
   diffusers_zimage:
     engine_class: "DiffusersEngine"
@@ -46,4 +46,37 @@ targets:
     task: "image-to-video"
     case_ids: ["wan22_5b_i2v"]
     params:
-      model: "Wan-AI/Wan2.2-I2V-5B-Diffusers"
+      # NOTE: Wan2.2 I2V uses A14B in official Diffusers repos.
+      model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
+
+  diffusers_wan22_t2v_a14b_480p:
+    engine_class: "DiffusersEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_a14b_t2v_480p"]
+    params:
+      model: "Wan-AI/Wan2.2-T2V-A14B-Diffusers"
+
+  diffusers_wan22_t2v_a14b_720p:
+    engine_class: "DiffusersEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_a14b_t2v_720p"]
+    params:
+      model: "Wan-AI/Wan2.2-T2V-A14B-Diffusers"
+
+  diffusers_wan22_i2v_a14b_480p:
+    engine_class: "DiffusersEngine"
+    type: "local"
+    task: "image-to-video"
+    case_ids: ["wan22_a14b_i2v_480p"]
+    params:
+      model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
+
+  diffusers_wan22_i2v_a14b_720p:
+    engine_class: "DiffusersEngine"
+    type: "local"
+    task: "image-to-video"
+    case_ids: ["wan22_a14b_i2v_720p"]
+    params:
+      model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"

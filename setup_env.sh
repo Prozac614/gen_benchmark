@@ -16,6 +16,21 @@ export HF_HUB_CACHE="$WORKSPACE_DIR/hf_cache/hub"
 export TRANSFORMERS_CACHE="$WORKSPACE_DIR/hf_cache/transformers"
 mkdir -p "$HF_HOME" "$HF_HUB_CACHE" "$TRANSFORMERS_CACHE"
 
+# Optional: login to Hugging Face for gated models (non-interactive).
+# Usage:
+#   export HF_TOKEN=...
+#   ./setup_env.sh /workspace
+if [ -n "${HF_TOKEN:-}" ]; then
+    echo "HF_TOKEN is set; attempting non-interactive Hugging Face login..."
+    if command -v huggingface-cli >/dev/null 2>&1; then
+        huggingface-cli login --token "$HF_TOKEN" || true
+    elif command -v hf >/dev/null 2>&1; then
+        hf auth login --token "$HF_TOKEN" || true
+    else
+        echo "Warning: neither 'huggingface-cli' nor 'hf' found; skipping HF login."
+    fi
+fi
+
 export PIP_BREAK_SYSTEM_PACKAGES=1
 if [ -f "requirements.txt" ]; then
     echo "Installing requirements from requirements.txt..."

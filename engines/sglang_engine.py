@@ -7,6 +7,7 @@ import statistics
 import tempfile
 import shutil
 import json
+import shlex
 
 from sglang.multimodal_gen import DiffGenerator
 from .base import BaseEngine    
@@ -31,6 +32,49 @@ class SGLangEngine(BaseEngine):
             server_args.setdefault("model_path", self.model)
             server_args.setdefault("num_gpus", self.num_gpus)
             self.generator = DiffGenerator.from_pretrained(server_args=server_args, local_mode=True)
+
+    def _format_equivalent_cli(self, *, sampling_params: Dict[str, Any]) -> str:
+        def q(v: Any) -> str:
+            return shlex.quote(str(v))
+
+        env_vars = self.params.get("env", {}) or {}
+        env_prefix = " ".join(f"{k}={q(v)}" for k, v in env_vars.items())
+
+        cmd: list[str] = ["sglang", "generate", f"--model-path={self.model}"]
+
+        # Common server args knobs (best-effort, omit unknown to avoid misleading commands)
+        server_args = dict(self.server_args or {})
+        for k in ("log_level", "warmup", "dit_layerwise_offload"):
+            if k in server_args:
+                cmd.append(f"--{k.replace('_','-')}={server_args[k]}")
+
+        # Sampling args
+        if "prompt" in sampling_params:
+            cmd.append(f"--prompt={sampling_params['prompt']}")
+        if "negative_prompt" in sampling_params:
+            cmd.append(f"--negative-prompt={sampling_params['negative_prompt']}")
+        if "image_path" in sampling_params:
+            cmd.append(f"--image-path={sampling_params['image_path']}")
+        if "width" in sampling_params:
+            cmd.append(f"--width={sampling_params['width']}")
+        if "height" in sampling_params:
+            cmd.append(f"--height={sampling_params['height']}")
+        if "num_inference_steps" in sampling_params:
+            cmd.append(f"--num-inference-steps={sampling_params['num_inference_steps']}")
+        if "num_frames" in sampling_params:
+            cmd.append(f"--num-frames={sampling_params['num_frames']}")
+        if "guidance_scale" in sampling_params:
+            cmd.append(f"--guidance-scale={sampling_params['guidance_scale']}")
+        if "seed" in sampling_params:
+            cmd.append(f"--seed={sampling_params['seed']}")
+
+        if sampling_params.get("save_output"):
+            cmd.append("--save-output")
+        if "output_path" in sampling_params:
+            cmd.append(f"--output-path={sampling_params['output_path']}")
+
+        rendered = " ".join(q(x) for x in cmd)
+        return (env_prefix + " " + rendered).strip() if env_prefix else rendered
 
     def _parse_sglang_metrics(self, perf_log_dir: str) -> Dict[str, Any]:
         log_file = os.path.join(perf_log_dir, "performance.log")
@@ -69,11 +113,17 @@ class SGLangEngine(BaseEngine):
         def _resolve_local_path(p: str | None):
             if not p or not isinstance(p, str):
                 return p
+            # Keep URLs as-is (so image_path can be a remote URL like the CLI example).
+            if p.startswith("http://") or p.startswith("https://"):
+                return p
             # Allow comma-separated list for multi-image edit models.
             if "," in p:
                 parts = [x.strip() for x in p.split(",") if x.strip()]
                 out = []
                 for part in parts:
+                    if part.startswith("http://") or part.startswith("https://"):
+                        out.append(part)
+                        continue
                     if os.path.isabs(part) or part.startswith("/"):
                         out.append(part)
                     else:
@@ -120,6 +170,14 @@ class SGLangEngine(BaseEngine):
         
         if "seed" in case_params:
             sampling_params["seed"] = case_params["seed"]
+
+        if bool(self.params.get("print_cli_command", True)):
+            try:
+                print("\nEquivalent CLI command:")
+                print(self._format_equivalent_cli(sampling_params=sampling_params))
+                print("")
+            except Exception as e:
+                print(f"Warning: failed to format equivalent CLI command: {e}")
 
         perf_log_dir = tempfile.mkdtemp()
         os.environ["SGLANG_PERF_LOG_DIR"] = perf_log_dir

@@ -99,6 +99,9 @@ targets:
     params:
       model: "black-forest-labs/FLUX.2-dev"
       <<: *sglang_common
+      # NOTE: SGLang ServerArgs in our pinned version does NOT accept `cpu_offload`.
+      # Keep this target "vanilla"; use Diffusers/LightX2V for CPU offload experiments.
+
   sglang_flux2_cachedit:
     engine_class: "SGLangEngine"
     type: "local"
@@ -132,7 +135,41 @@ targets:
         warmup: false
         log_level: "error"
         dit_layerwise_offload: false
-  
+        
+  sglang_wan22_t2v_5b_layerwise_offload:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_5b_t2v"]
+    params:
+      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
+      <<: *sglang_common
+      server_args:
+        dit_layerwise_offload: true 
+
+  sglang_wan22_i2v_5b:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "image-to-video"
+    case_ids: ["wan22_5b_i2v"]
+    params:
+      # NOTE: Wan2.2 I2V uses A14B in official Diffusers repos.
+      model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
+      <<: *sglang_common
+      server_args:
+        dit_layerwise_offload: false
+
+  sglang_wan22_i2v_5b_layerwise_offload:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "image-to-video"
+    case_ids: ["wan22_5b_i2v"]
+    params:
+      model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
+      <<: *sglang_common
+      server_args:
+        dit_layerwise_offload: true
+        
   sglang_wan22_t2v_5b_cachedit:
     engine_class: "SGLangEngine"
     type: "local"
@@ -166,13 +203,13 @@ targets:
         SGLANG_CACHE_DIT_SECONDARY_TAYLORSEER: "false"
         SGLANG_CACHE_DIT_SECONDARY_TS_ORDER: "1"
 
-  sglang_wan22_i2v_5b_cachedit:
+  sglang_wan22_i2v_cachedit:
     engine_class: "SGLangEngine"
     type: "local"
     task: "image-to-video"
     case_ids: ["wan22_5b_i2v"]
     params:
-      model: "Wan-AI/Wan2.2-I2V-5B-Diffusers"
+      model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
       <<: *sglang_common
       # Disable default auto-enable for Wan
       server_args:
@@ -198,3 +235,39 @@ targets:
         SGLANG_CACHE_DIT_SECONDARY_MC: "3"
         SGLANG_CACHE_DIT_SECONDARY_TAYLORSEER: "false"
         SGLANG_CACHE_DIT_SECONDARY_TS_ORDER: "1"
+
+  sglang_wan22_t2v_480p:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_a14b_t2v_480p"]
+    params:
+      model: "Wan-AI/Wan2.2-T2V-A14B-Diffusers"
+      <<: *sglang_common
+
+  sglang_wan22_t2v_720p:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_a14b_t2v_720p"]
+    params:
+      model: "Wan-AI/Wan2.2-T2V-A14B-Diffusers"
+      <<: *sglang_common
+
+  sglang_wan22_i2v_480p:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "image-to-video"
+    case_ids: ["wan22_a14b_i2v_480p"]
+    params:
+      model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
+      <<: *sglang_common
+
+  sglang_wan22_i2v_720p:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "image-to-video"
+    case_ids: ["wan22_a14b_i2v_720p"]
+    params:
+      model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
+      <<: *sglang_common

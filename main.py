@@ -10,6 +10,7 @@ import argparse
 from datetime import datetime
 from typing import Dict, Any, List, Tuple, Optional
 import re
+import shlex
 from dotenv import load_dotenv
 import yaml
 import pandas as pd
@@ -18,7 +19,6 @@ from monitor import GPUMonitor
 
 
 def _deep_merge_dicts(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]:
-    """Shallow merge for dict values; override wins."""
     merged = dict(base or {})
     merged.update(override or {})
     return merged
@@ -45,12 +45,6 @@ def _merge_item_with_params(default_item: Dict[str, Any], item: Dict[str, Any]) 
 def _normalize_list_or_map(
     value: Any, *, key_field: str, defaults: Dict[str, Any]
 ) -> List[Dict[str, Any]]:
-    """
-    Accept either:
-    - list[dict]
-    - dict[name|id -> dict]
-    and return list[dict] with `key_field` set when input is a dict.
-    """
     if value is None:
         return []
     if isinstance(value, dict):
@@ -187,13 +181,11 @@ def _load_raw_with_includes(config_path: str, seen: set[str]) -> Dict[str, Any]:
 
 
 def load_config(config_path: str) -> Dict[str, Any]:
-    """Load configuration from YAML file (supports `includes:`)."""
     raw = _load_raw_with_includes(config_path, seen=set())
     return normalize_config(raw)
 
 
 def get_engine_class(engine_class_name: str):
-    """Dynamically get engine class by name."""
     return getattr(engines, engine_class_name)
 
 def _slugify(s: str) -> str:
@@ -256,41 +248,59 @@ def _truthy_env_value(v: Any) -> bool:
 
 def _infer_cache_tag(target: Dict[str, Any]) -> str:
     """
-    Infer an output directory tag for cache acceleration variants so outputs don't mix.
-
     Examples:
     - vLLM-Omni: params.cache_backend in {cache_dit, tea_cache}
     - SGLang: params.env.SGLANG_CACHE_DIT_ENABLED=true
+    - SGLang: params.server_args.dit_layerwise_offload=true
     """
     params = target.get("params") or {}
     if not isinstance(params, dict):
         return ""
+
+    tags: list[str] = []
 
     # vLLM-Omni style
     cache_backend = params.get("cache_backend")
     if isinstance(cache_backend, str) and cache_backend.strip():
         cb = cache_backend.strip().lower()
         if cb in ("cache_dit", "cache-dit"):
-            return "__cache_dit"
+            tags.append("__cache_dit")
         if cb in ("tea_cache", "tea-cache"):
-            return "__tea_cache"
-        return f"__{_slugify(cb)}"
+            tags.append("__tea_cache")
+        else:
+            tags.append(f"__{_slugify(cb)}")
 
     # SGLang style env var toggle
     env_vars = params.get("env") or {}
     if isinstance(env_vars, dict) and _truthy_env_value(env_vars.get("SGLANG_CACHE_DIT_ENABLED")):
-        return "__cache_dit"
+        tags.append("__cache_dit")
+
+    # SGLang Wan knob: layerwise offload
+    server_args = params.get("server_args") or {}
+    if isinstance(server_args, dict) and _truthy_env_value(server_args.get("dit_layerwise_offload")):
+        tags.append("__layerwise_offload")
 
     # Fallback: if target name already encodes it, mirror it for readability
     name = target.get("name") or ""
     if isinstance(name, str):
         ln = name.lower()
         if "cachedit" in ln or "cache_dit" in ln:
-            return "__cache_dit"
+            tags.append("__cache_dit")
         if "tea_cache" in ln or "teacache" in ln:
-            return "__tea_cache"
+            tags.append("__tea_cache")
+        if "layerwise_offload" in ln or "layerwiseoffload" in ln:
+            tags.append("__layerwise_offload")
 
-    return ""
+    if not tags:
+        return ""
+    # Preserve order while deduplicating
+    out: list[str] = []
+    seen: set[str] = set()
+    for t in tags:
+        if t not in seen:
+            out.append(t)
+            seen.add(t)
+    return "".join(out)
 
 
 def _case_dir_from_output_path(output_path: str) -> str:
@@ -402,6 +412,18 @@ def run_benchmark(config_path: str, target_names: Optional[List[str]] = None) ->
         print(f"  Class: {engine_class_name}")
         print(f"  Type: {target_type}")
         print(f"  Task: {target_task}")
+        try:
+            self_cmd = [
+                sys.executable,
+                os.path.abspath(__file__),
+                "--config",
+                os.path.abspath(config_path),
+                "--targets",
+                target_name,
+            ]
+            print(f"  Command: {shlex.join(self_cmd)}")
+        except Exception:
+            pass
         print(f"{'='*60}")
         
         try:
@@ -509,7 +531,6 @@ def run_benchmark(config_path: str, target_names: Optional[List[str]] = None) ->
 
 
 def main():
-    """Main entry point."""
     load_dotenv()
     os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
     parser = argparse.ArgumentParser(
@@ -534,6 +555,12 @@ def main():
     print("  Generation Benchmark Runner")
     print("="*60)
     print(f"Config: {args.config}")
+    # Print the exact command used to invoke this run (copy-paste friendly).
+    try:
+        invoked = [sys.executable, os.path.abspath(__file__), *sys.argv[1:]]
+        print(f"Command: {shlex.join(invoked)}")
+    except Exception:
+        pass
     print()
     
     # Run benchmark

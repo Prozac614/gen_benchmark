@@ -100,6 +100,7 @@ targets:
       model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
       env:
         DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+        
   vllm_omni_wan22_ti2v_5b_cachedit:
     engine_class: "VllmOmniEngine"
     type: "local"
@@ -125,7 +126,8 @@ targets:
     type: "local"
     task: "image-to-video"
     params:
-      model: "Wan-AI/Wan2.2-I2V-5B-Diffusers"
+      # NOTE: Wan2.2 I2V uses A14B in official Diffusers repos.
+      model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
       env:
         DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
   
@@ -134,7 +136,7 @@ targets:
     type: "local"
     task: "image-to-video"
     params:
-      model: "Wan-AI/Wan2.2-I2V-5B-Diffusers"
+      model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
       cache_backend: "cache_dit"
       cache_config:
         Fn_compute_blocks: 1
@@ -146,6 +148,46 @@ targets:
         taylorseer_order: 1
         scm_steps_mask_policy: null
         scm_steps_policy: "dynamic"
+      env:
+        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+
+  vllm_omni_wan22_t2v_a14b_480p:
+    engine_class: "VllmOmniEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_a14b_t2v_480p"]
+    params:
+      model: "Wan-AI/Wan2.2-T2V-A14B-Diffusers"
+      env:
+        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+
+  vllm_omni_wan22_t2v_a14b_720p:
+    engine_class: "VllmOmniEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_a14b_t2v_720p"]
+    params:
+      model: "Wan-AI/Wan2.2-T2V-A14B-Diffusers"
+      env:
+        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+
+  vllm_omni_wan22_i2v_a14b_480p:
+    engine_class: "VllmOmniEngine"
+    type: "local"
+    task: "image-to-video"
+    case_ids: ["wan22_a14b_i2v_480p"]
+    params:
+      model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
+      env:
+        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+
+  vllm_omni_wan22_i2v_a14b_720p:
+    engine_class: "VllmOmniEngine"
+    type: "local"
+    task: "image-to-video"
+    case_ids: ["wan22_a14b_i2v_720p"]
+    params:
+      model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
       env:
         DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
         
