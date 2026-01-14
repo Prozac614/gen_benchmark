@@ -116,6 +116,42 @@ class SGLangEngine(BaseEngine):
             cmd.append(f"--output-path={sampling_params['output_path']}")
         return cmd
 
+    def _build_cli_verify_argv(self, *, sampling_params: Dict[str, Any]) -> list[str]:
+        argv = self._build_equivalent_cli_argv(sampling_params=sampling_params)
+
+        out: list[str] = []
+        saw_warmup = False
+        for tok in argv:
+            if tok.startswith("--log-level="):
+                continue
+            if tok.startswith("--warmup="):
+                out.append("--warmup=True")
+                saw_warmup = True
+                continue
+            out.append(tok)
+        if not saw_warmup:
+            out.insert(3, "--warmup=True")
+        return out
+
+    def _format_cli_from_argv(self, argv: list[str]) -> str:
+        """
+        Render a CLI command string from argv, keeping prompt-like args double-quoted.
+        """
+        def dq(v: str) -> str:
+            s = str(v)
+            s = s.replace("\\", "\\\\").replace('"', '\\"')
+            return f"\"{s}\""
+
+        rendered: list[str] = []
+        for tok in argv:
+            if tok.startswith("--prompt="):
+                rendered.append("--prompt=" + dq(tok[len("--prompt="):]))
+            elif tok.startswith("--negative-prompt="):
+                rendered.append("--negative-prompt=" + dq(tok[len("--negative-prompt="):]))
+            else:
+                rendered.append(shlex.quote(tok))
+        return " ".join(rendered)
+
     def _parse_sglang_metrics(self, perf_log_dir: str) -> Dict[str, Any]:
         log_file = os.path.join(perf_log_dir, "performance.log")
         if not os.path.exists(log_file):
@@ -275,8 +311,8 @@ class SGLangEngine(BaseEngine):
                 verify_params["output_path"] = verify_out
                 verify_params["save_output"] = True
 
-                cli_str = self._format_equivalent_cli(sampling_params=verify_params)
-                argv = self._build_equivalent_cli_argv(sampling_params=verify_params)
+                argv = self._build_cli_verify_argv(sampling_params=verify_params)
+                cli_str = self._format_cli_from_argv(argv)
 
                 env = dict(os.environ)
                 for k, v in (self.params.get("env", {}) or {}).items():
@@ -323,7 +359,7 @@ class SGLangEngine(BaseEngine):
             sep = f"{green}{'=' * 100}{reset}"
             try:
                 print("\n" + sep)
-                print(f"{green}CLI verify (after unload){reset}")
+                print(f"{green}CLI verify {reset}")
                 print(self._pending_cli_verify["cli_str"])
                 print(sep)
                 subprocess.run(self._pending_cli_verify["argv"], env=self._pending_cli_verify["env"], check=True)
