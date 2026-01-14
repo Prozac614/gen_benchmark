@@ -14,7 +14,7 @@ cases:
     interpolator_model: none
 
     num_frames: 81
-    resolution: "580p"
+    resolution: "720p"
     aspect_ratio: "16:9"
     
     seed: 42
@@ -26,5 +26,7 @@ targets:
     engine_class: "FalEngine"
     type: "remote"
     task: "video"
-    fal_model: "fal-ai/wan/v2.2-5b/image-to-video"
+    # fal_model: "fal-ai/wan/v2.2-5b/image-to-video"
+    fal_model: "fal-ai/wan/v2.2-a14b/image-to-video"
+    
     output_dir: "outputs"
