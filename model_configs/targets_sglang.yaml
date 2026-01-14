@@ -6,6 +6,7 @@ defaults:
       log_level: "error"
 
 targets:
+
   sglang_qwen_2512:
     engine_class: "SGLangEngine"
     type: "local"
@@ -14,7 +15,131 @@ targets:
     params:
       model: "Qwen/Qwen-Image-2512"
       <<: *sglang_common
-      
+
+  sglang_zimage:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "text-to-image"
+    case_ids: ["zimage_turbo_t2i"]
+    params:
+      model: "Tongyi-MAI/Z-Image-Turbo"
+      <<: *sglang_common
+
+  # -----------------------------------------------------------------------------
+  # Wan 2.2 TI2V-5B I2V (480p & 720p)
+  # -----------------------------------------------------------------------------
+  sglang_wan22_ti2v_5b_i2v_480p:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "image-to-video"
+    case_ids: ["wan22_ti2v_5b_i2v_480p"]
+    params:
+      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
+      <<: *sglang_common
+      server_args:
+        dit_layerwise_offload: true 
+      env:
+        SGLANG_CACHE_DIT_ENABLED: "false"
+
+  sglang_wan22_ti2v_5b_i2v_720p:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "image-to-video"
+    case_ids: ["wan22_ti2v_5b_i2v_720p"]
+    params:
+      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
+      <<: *sglang_common
+      server_args:
+        dit_layerwise_offload: true 
+      env:
+        SGLANG_CACHE_DIT_ENABLED: "false"
+
+  # -----------------------------------------------------------------------------
+  # Wan 2.2 TI2V-5B T2V (480p & 720p)
+  # -----------------------------------------------------------------------------
+  sglang_wan22_ti2v_5b_t2v_480p:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_ti2v_5b_t2v_480p"]
+    params:
+      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
+      <<: *sglang_common
+      server_args:
+        dit_layerwise_offload: true 
+      env:
+        SGLANG_CACHE_DIT_ENABLED: "false"
+  
+  sglang_wan22_ti2v_5b_t2v_720p:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_ti2v_5b_t2v_720p"]
+    params:
+      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
+      <<: *sglang_common
+      server_args:
+        dit_layerwise_offload: true 
+      env:
+        SGLANG_CACHE_DIT_ENABLED: "false"
+
+  # -----------------------------------------------------------------------------
+  # Wan 2.2 T2V-A14B (480p & 720p)
+  # -----------------------------------------------------------------------------
+  sglang_wan22_t2v_a14b_480p:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_t2v_a14b_480p"]
+    params:
+      model: "Wan-AI/Wan2.2-T2V-A14B-Diffusers"
+      <<: *sglang_common
+      env:
+        SGLANG_CACHE_DIT_ENABLED: "false"
+
+  sglang_wan22_t2v_a14b_720p:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_t2v_a14b_720p"]
+    params:
+      model: "Wan-AI/Wan2.2-T2V-A14B-Diffusers"
+      <<: *sglang_common
+      env:
+        SGLANG_CACHE_DIT_ENABLED: "false"     
+        
+  # -----------------------------------------------------------------------------
+  # Wan 2.2 I2V-A14B (480p & 720p)
+  # -----------------------------------------------------------------------------
+  sglang_wan22_i2v_a14b_480p:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "image-to-video"
+    case_ids: ["wan22_i2v_a14b_480p"]
+    params:
+      model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
+      <<: *sglang_common
+      server_args:
+        dit_layerwise_offload: true
+      env:
+        SGLANG_CACHE_DIT_ENABLED: "false"
+  
+  sglang_wan22_i2v_a14b_720p:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "image-to-video"
+    case_ids: ["wan22_i2v_a14b_720p"]
+    params:
+      model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
+      <<: *sglang_common
+      server_args:
+        dit_layerwise_offload: true
+      env:
+        SGLANG_CACHE_DIT_ENABLED: "false"
+        
+  # -----------------------------------------------------------------------------
+  # Cache-DiT
+  # -----------------------------------------------------------------------------
   sglang_qwen_2512_cachedit:
     engine_class: "SGLangEngine"
     type: "local"
@@ -43,6 +168,7 @@ targets:
     params:
       model: "Qwen/Qwen-Image-Edit-2511"
       <<: *sglang_common
+
   sglang_qwen_edit_2511_cachedit:
     engine_class: "SGLangEngine"
     type: "local"
@@ -63,101 +189,15 @@ targets:
         SGLANG_CACHE_DIT_SCM_PRESET: "none"
         SGLANG_CACHE_DIT_SCM_POLICY: "dynamic"
 
-  sglang_zimage:
-    engine_class: "SGLangEngine"
-    type: "local"
-    task: "text-to-image"
-    case_ids: ["zimage_turbo_t2i"]
-    params:
-      model: "Tongyi-MAI/Z-Image-Turbo"
-      <<: *sglang_common
 
-  # sglang_flux2:
-  #   engine_class: "SGLangEngine"
-  #   type: "local"
-  #   task: "text-to-image"
-  #   case_ids: ["flux2_t2i"]
-  #   params:
-  #     model: "black-forest-labs/FLUX.2-dev"
-  #     <<: *sglang_common
-
-  sglang_flux2_cachedit:
-    engine_class: "SGLangEngine"
-    type: "local"
-    task: "text-to-image"
-    case_ids: ["flux2_t2i"]
-    params:
-      model: "black-forest-labs/FLUX.2-dev"
-      <<: *sglang_common
-      env:
-        SGLANG_CACHE_DIT_ENABLED: "true"
-        SGLANG_CACHE_DIT_FN: "1"
-        SGLANG_CACHE_DIT_BN: "0"
-        SGLANG_CACHE_DIT_WARMUP: "4"
-        SGLANG_CACHE_DIT_RDT: "0.24"
-        SGLANG_CACHE_DIT_MC: "3"
-        SGLANG_CACHE_DIT_TAYLORSEER: "false"
-        SGLANG_CACHE_DIT_TS_ORDER: "1"
-        SGLANG_CACHE_DIT_SCM_PRESET: "none"
-        SGLANG_CACHE_DIT_SCM_POLICY: "dynamic"
-
-  # sglang_wan22_t2v_5b:
-  #   engine_class: "SGLangEngine"
-  #   type: "local"
-  #   task: "text-to-video"
-  #   case_ids: ["wan22_5b_t2v"]
-  #   params:
-  #     model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
-  #     <<: *sglang_common
-  #     # Disable default auto-enable for Wan
-  #     server_args:
-  #       warmup: false
-  #       log_level: "error"
-  #       dit_layerwise_offload: false
-        
-  sglang_wan22_t2v_5b_layerwise_offload:
+  sglang_wan22_ti2v_5b_i2v_480p_cachedit:
     engine_class: "SGLangEngine"
     type: "local"
     task: "text-to-video"
-    case_ids: ["wan22_5b_t2v"]
+    case_ids: ["wan22_ti2v_5b_i2v_480p"]
     params:
       model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
       <<: *sglang_common
-      server_args:
-        dit_layerwise_offload: true 
-
-  # sglang_wan22_i2v_5b:
-  #   engine_class: "SGLangEngine"
-  #   type: "local"
-  #   task: "image-to-video"
-  #   case_ids: ["wan22_5b_i2v"]
-  #   params:
-  #     # NOTE: Wan2.2 I2V uses A14B in official Diffusers repos.
-  #     model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
-  #     <<: *sglang_common
-  #     server_args:
-  #       dit_layerwise_offload: false
-
-  sglang_wan22_i2v_5b_layerwise_offload:
-    engine_class: "SGLangEngine"
-    type: "local"
-    task: "image-to-video"
-    case_ids: ["wan22_5b_i2v"]
-    params:
-      model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
-      <<: *sglang_common
-      server_args:
-        dit_layerwise_offload: true
-        
-  sglang_wan22_t2v_5b_cachedit:
-    engine_class: "SGLangEngine"
-    type: "local"
-    task: "text-to-video"
-    case_ids: ["wan22_5b_t2v"]
-    params:
-      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
-      <<: *sglang_common
-      # Disable default auto-enable for Wan
       server_args:
         warmup: false
         log_level: "error"
@@ -173,7 +213,6 @@ targets:
         SGLANG_CACHE_DIT_TS_ORDER: "1"
         SGLANG_CACHE_DIT_SCM_PRESET: "none"
         SGLANG_CACHE_DIT_SCM_POLICY: "dynamic"
-        # secondary transformer (Wan experts)
         SGLANG_CACHE_DIT_SECONDARY_FN: "1"
         SGLANG_CACHE_DIT_SECONDARY_BN: "0"
         SGLANG_CACHE_DIT_SECONDARY_WARMUP: "4"
@@ -182,15 +221,14 @@ targets:
         SGLANG_CACHE_DIT_SECONDARY_TAYLORSEER: "false"
         SGLANG_CACHE_DIT_SECONDARY_TS_ORDER: "1"
 
-  sglang_wan22_i2v_cachedit:
+  sglang_wan22_ti2v_5b_i2v_720p_cachedit:
     engine_class: "SGLangEngine"
     type: "local"
-    task: "image-to-video"
-    case_ids: ["wan22_5b_i2v"]
+    task: "text-to-video"
+    case_ids: ["wan22_ti2v_5b_i2v_720p"]
     params:
-      model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
+      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
       <<: *sglang_common
-      # Disable default auto-enable for Wan
       server_args:
         warmup: false
         log_level: "error"
@@ -206,7 +244,6 @@ targets:
         SGLANG_CACHE_DIT_TS_ORDER: "1"
         SGLANG_CACHE_DIT_SCM_PRESET: "none"
         SGLANG_CACHE_DIT_SCM_POLICY: "dynamic"
-        # secondary transformer (Wan experts)
         SGLANG_CACHE_DIT_SECONDARY_FN: "1"
         SGLANG_CACHE_DIT_SECONDARY_BN: "0"
         SGLANG_CACHE_DIT_SECONDARY_WARMUP: "4"
@@ -215,38 +252,190 @@ targets:
         SGLANG_CACHE_DIT_SECONDARY_TAYLORSEER: "false"
         SGLANG_CACHE_DIT_SECONDARY_TS_ORDER: "1"
 
-  sglang_wan22_t2v_480p:
+  sglang_wan22_ti2v_5b_t2v_480p_cachedit:
     engine_class: "SGLangEngine"
     type: "local"
     task: "text-to-video"
-    case_ids: ["wan22_a14b_t2v_480p"]
+    case_ids: ["wan22_ti2v_5b_t2v_480p"]
     params:
-      model: "Wan-AI/Wan2.2-T2V-A14B"
+      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
       <<: *sglang_common
+      server_args:
+        warmup: false
+        log_level: "error"
+        dit_layerwise_offload: false
+      env:
+        SGLANG_CACHE_DIT_ENABLED: "true"
+        SGLANG_CACHE_DIT_FN: "1"
+        SGLANG_CACHE_DIT_BN: "0"
+        SGLANG_CACHE_DIT_WARMUP: "4"
+        SGLANG_CACHE_DIT_RDT: "0.24"
+        SGLANG_CACHE_DIT_MC: "3"
+        SGLANG_CACHE_DIT_TAYLORSEER: "false"
+        SGLANG_CACHE_DIT_TS_ORDER: "1"
+        SGLANG_CACHE_DIT_SCM_PRESET: "none"
+        SGLANG_CACHE_DIT_SCM_POLICY: "dynamic"
+        SGLANG_CACHE_DIT_SECONDARY_FN: "1"
+        SGLANG_CACHE_DIT_SECONDARY_BN: "0"
+        SGLANG_CACHE_DIT_SECONDARY_WARMUP: "4"
+        SGLANG_CACHE_DIT_SECONDARY_RDT: "0.24"
+        SGLANG_CACHE_DIT_SECONDARY_MC: "3"
+        SGLANG_CACHE_DIT_SECONDARY_TAYLORSEER: "false"
+        SGLANG_CACHE_DIT_SECONDARY_TS_ORDER: "1"
 
-  sglang_wan22_t2v_720p:
+
+  sglang_wan22_ti2v_5b_t2v_720p_cachedit:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_ti2v_5b_t2v_720p"]
+    params:
+      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
+      <<: *sglang_common
+      server_args:
+        warmup: false
+        log_level: "error"
+        dit_layerwise_offload: false
+      env:
+        SGLANG_CACHE_DIT_ENABLED: "true"
+        SGLANG_CACHE_DIT_FN: "1"
+        SGLANG_CACHE_DIT_BN: "0"
+        SGLANG_CACHE_DIT_WARMUP: "4"
+        SGLANG_CACHE_DIT_RDT: "0.24"
+        SGLANG_CACHE_DIT_MC: "3"
+        SGLANG_CACHE_DIT_TAYLORSEER: "false"
+        SGLANG_CACHE_DIT_TS_ORDER: "1"
+        SGLANG_CACHE_DIT_SCM_PRESET: "none"
+        SGLANG_CACHE_DIT_SCM_POLICY: "dynamic"
+        SGLANG_CACHE_DIT_SECONDARY_FN: "1"
+        SGLANG_CACHE_DIT_SECONDARY_BN: "0"
+        SGLANG_CACHE_DIT_SECONDARY_WARMUP: "4"
+        SGLANG_CACHE_DIT_SECONDARY_RDT: "0.24"
+        SGLANG_CACHE_DIT_SECONDARY_MC: "3"
+        SGLANG_CACHE_DIT_SECONDARY_TAYLORSEER: "false"
+        SGLANG_CACHE_DIT_SECONDARY_TS_ORDER: "1"
+
+  sglang_wan22_t2v_a14b_480p_cachedit:
+    engine_class: "SGLangEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_t2v_a14b_480p"]
+    params:
+      model: "Wan-AI/Wan2.2-T2V-A14B-Diffusers"
+      <<: *sglang_common
+      server_args:
+        warmup: false
+        log_level: "error"
+        dit_layerwise_offload: false
+      env:
+        SGLANG_CACHE_DIT_ENABLED: "true"
+        SGLANG_CACHE_DIT_FN: "1"
+        SGLANG_CACHE_DIT_BN: "0"
+        SGLANG_CACHE_DIT_WARMUP: "4"
+        SGLANG_CACHE_DIT_RDT: "0.24"
+        SGLANG_CACHE_DIT_MC: "3"
+        SGLANG_CACHE_DIT_TAYLORSEER: "false"
+        SGLANG_CACHE_DIT_TS_ORDER: "1"
+        SGLANG_CACHE_DIT_SCM_PRESET: "none"
+        SGLANG_CACHE_DIT_SCM_POLICY: "dynamic"
+        SGLANG_CACHE_DIT_SECONDARY_FN: "1"
+        SGLANG_CACHE_DIT_SECONDARY_BN: "0"
+        SGLANG_CACHE_DIT_SECONDARY_WARMUP: "4"
+        SGLANG_CACHE_DIT_SECONDARY_RDT: "0.24"
+        SGLANG_CACHE_DIT_SECONDARY_MC: "3"
+        SGLANG_CACHE_DIT_SECONDARY_TAYLORSEER: "false"
+        SGLANG_CACHE_DIT_SECONDARY_TS_ORDER: "1"
+
+  sglang_wan22_t2v_a14b_720p_cachedit:
     engine_class: "SGLangEngine"
     type: "local"
     task: "text-to-video"
     case_ids: ["wan22_a14b_t2v_720p"]
     params:
-      model: "Wan-AI/Wan2.2-T2V-A14B"
+      model: "Wan-AI/Wan2.2-T2V-A14B-Diffusers"
       <<: *sglang_common
+      server_args:
+        warmup: false
+        log_level: "error"
+        dit_layerwise_offload: false
+      env:
+        SGLANG_CACHE_DIT_ENABLED: "true"
+        SGLANG_CACHE_DIT_FN: "1"
+        SGLANG_CACHE_DIT_BN: "0"
+        SGLANG_CACHE_DIT_WARMUP: "4"
+        SGLANG_CACHE_DIT_RDT: "0.24"
+        SGLANG_CACHE_DIT_MC: "3"
+        SGLANG_CACHE_DIT_TAYLORSEER: "false"
+        SGLANG_CACHE_DIT_TS_ORDER: "1"
+        SGLANG_CACHE_DIT_SCM_PRESET: "none"
+        SGLANG_CACHE_DIT_SCM_POLICY: "dynamic"
+        SGLANG_CACHE_DIT_SECONDARY_FN: "1"
+        SGLANG_CACHE_DIT_SECONDARY_BN: "0"
+        SGLANG_CACHE_DIT_SECONDARY_WARMUP: "4"
+        SGLANG_CACHE_DIT_SECONDARY_RDT: "0.24"
+        SGLANG_CACHE_DIT_SECONDARY_MC: "3"
+        SGLANG_CACHE_DIT_SECONDARY_TAYLORSEER: "false"
+        SGLANG_CACHE_DIT_SECONDARY_TS_ORDER: "1"
 
-  sglang_wan22_i2v_480p:
+  sglang_wan22_i2v_a14b_480p_cachedit:
     engine_class: "SGLangEngine"
     type: "local"
     task: "image-to-video"
-    case_ids: ["wan22_a14b_i2v_480p"]
+    case_ids: ["wan22_i2v_a14b_480p"]
     params:
       model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
       <<: *sglang_common
+      server_args:
+        warmup: false
+        log_level: "error"
+        dit_layerwise_offload: false
+      env:
+        SGLANG_CACHE_DIT_ENABLED: "true"
+        SGLANG_CACHE_DIT_FN: "1"
+        SGLANG_CACHE_DIT_BN: "0"
+        SGLANG_CACHE_DIT_WARMUP: "4"
+        SGLANG_CACHE_DIT_RDT: "0.24"
+        SGLANG_CACHE_DIT_MC: "3"
+        SGLANG_CACHE_DIT_TAYLORSEER: "false"
+        SGLANG_CACHE_DIT_TS_ORDER: "1"
+        SGLANG_CACHE_DIT_SCM_PRESET: "none"
+        SGLANG_CACHE_DIT_SCM_POLICY: "dynamic"
+        SGLANG_CACHE_DIT_SECONDARY_FN: "1"
+        SGLANG_CACHE_DIT_SECONDARY_BN: "0"
+        SGLANG_CACHE_DIT_SECONDARY_WARMUP: "4"
+        SGLANG_CACHE_DIT_SECONDARY_RDT: "0.24"
+        SGLANG_CACHE_DIT_SECONDARY_MC: "3"
+        SGLANG_CACHE_DIT_SECONDARY_TAYLORSEER: "false"
+        SGLANG_CACHE_DIT_SECONDARY_TS_ORDER: "1"
 
-  sglang_wan22_i2v_720p:
+  sglang_wan22_i2v_a14b_720p_cachedit:
     engine_class: "SGLangEngine"
     type: "local"
     task: "image-to-video"
-    case_ids: ["wan22_a14b_i2v_720p"]
+    case_ids: ["wan22_i2v_a14b_720p"]
     params:
       model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
       <<: *sglang_common
+      server_args:
+        warmup: false
+        log_level: "error"
+        dit_layerwise_offload: false
+      env:
+        SGLANG_CACHE_DIT_ENABLED: "true"
+        SGLANG_CACHE_DIT_FN: "1"
+        SGLANG_CACHE_DIT_BN: "0"
+        SGLANG_CACHE_DIT_WARMUP: "4"
+        SGLANG_CACHE_DIT_RDT: "0.24"
+        SGLANG_CACHE_DIT_MC: "3"
+        SGLANG_CACHE_DIT_TAYLORSEER: "false"
+        SGLANG_CACHE_DIT_TS_ORDER: "1"
+        SGLANG_CACHE_DIT_SCM_PRESET: "none"
+        SGLANG_CACHE_DIT_SCM_POLICY: "dynamic"
+        SGLANG_CACHE_DIT_SECONDARY_FN: "1"
+        SGLANG_CACHE_DIT_SECONDARY_BN: "0"
+        SGLANG_CACHE_DIT_SECONDARY_WARMUP: "4"
+        SGLANG_CACHE_DIT_SECONDARY_RDT: "0.24"
+        SGLANG_CACHE_DIT_SECONDARY_MC: "3"
+        SGLANG_CACHE_DIT_SECONDARY_TAYLORSEER: "false"
+        SGLANG_CACHE_DIT_SECONDARY_TS_ORDER: "1"
+      

@@ -30,14 +30,14 @@ cases:
       height: 1024
       width: 1024
       custom_shape: [1024, 1024]
-      input_image_preprocess: "pad_blur"
+      input_image_preprocess: "none"
       guidance_scale: 4.0
       negative_prompt: " "
       image_path: "figs/cat.png"
       aspect_ratio: "1:1"
 
   # ------------------------------ Wan 2.2 TI2V-5B (I2V) ----------------------------
-  - id: "wan22_5b_i2v"
+  - id: "wan22_ti2v_5b_i2v_480p"
     prompt: "An astronaut hatching from an egg, on the surface of the moon, the darkness and depth of space realised in the background. High quality, ultrarealistic detail and breath-taking movie-like camera shot."
     task: "image-to-video"
     params:
@@ -45,102 +45,98 @@ cases:
       negative_prompt: "Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards"
       num_frames: 81
       guidance_scale: 5.0
-      height: 700
+      num_inference_steps: 50
+      height: 480
+      width: 832
+
+  - id: "wan22_ti2v_5b_i2v_720p"
+    prompt: "An astronaut hatching from an egg, on the surface of the moon, the darkness and depth of space realised in the background. High quality, ultrarealistic detail and breath-taking movie-like camera shot."
+    task: "image-to-video"
+    params:
+      image_path: "figs/astronaut.jpg"
+      negative_prompt: "Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards"
+      num_frames: 81
+      height: 720
       width: 1280
+      num_inference_steps: 50
+      guidance_scale: 5.0
 
   # ------------------------------ Wan 2.2 TI2V-5B (T2V) ----------------------------
-  - id: "wan22_5b_t2v"
+  - id: "wan22_ti2v_5b_t2v_480p"
     prompt: "A cat and a dog baking a cake together in a kitchen. The cat is carefully measuring flour, while the dog is stirring the batter with a wooden spoon. The kitchen is cozy, with sunlight streaming through the window."
     task: "text-to-video"
     params:
-      negative_prompt: " " # SGLang's Wan pipeline rejects empty-string negative_prompt.
+      negative_prompt: " "
       num_frames: 81
       guidance_scale: 5.0
-      height: 700
+      num_inference_steps: 50
+      height: 480
+      width: 832
+
+  - id: "wan22_ti2v_5b_t2v_720p"
+    prompt: "A cat and a dog baking a cake together in a kitchen. The cat is carefully measuring flour, while the dog is stirring the batter with a wooden spoon. The kitchen is cozy, with sunlight streaming through the window."
+    task: "text-to-video"
+    params:
+      negative_prompt: " "
+      num_frames: 81
+      guidance_scale: 5.0
+      num_inference_steps: 50
+      height: 720
       width: 1280
 
   # ------------------------------ Wan 2.2 T2V-A14B (480p / 720p) ------------------
-  - id: "wan22_a14b_t2v_480p"
+  - id: "wan22_t2v_a14b_480p"
     prompt: "A cat and a dog baking a cake together in a kitchen. The cat is carefully measuring flour, while the dog is stirring the batter with a wooden spoon. The kitchen is cozy, with sunlight streaming through the window."
     task: "text-to-video"
     params:
       negative_prompt: " "
       num_frames: 81
       guidance_scale: 5.0
+      num_inference_steps: 50
       height: 480
       width: 832
 
-  - id: "wan22_a14b_t2v_720p"
+  - id: "wan22_t2v_a14b_720p"
     prompt: "A cat and a dog baking a cake together in a kitchen. The cat is carefully measuring flour, while the dog is stirring the batter with a wooden spoon. The kitchen is cozy, with sunlight streaming through the window."
     task: "text-to-video"
     params:
       negative_prompt: " "
       num_frames: 81
       guidance_scale: 5.0
-      height: 700
+      num_inference_steps: 50
+      height: 720
       width: 1280
 
   # ------------------------------ Wan 2.2 I2V-A14B (480p / 720p) ------------------
-  - id: "wan22_a14b_i2v_480p"
+  - id: "wan22_i2v_a14b_480p"
     prompt: "An astronaut hatching from an egg, on the surface of the moon, the darkness and depth of space realised in the background. High quality, ultrarealistic detail and breath-taking movie-like camera shot."
     task: "image-to-video"
     params:
       image_path: "figs/astronaut.jpg"
       negative_prompt: "Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards"
       num_frames: 81
-      guidance_scale: 5.0
       height: 480
       width: 832
+      num_inference_steps: 50
+      guidance_scale: 5.0
 
-  - id: "wan22_a14b_i2v_720p"
+  - id: "wan22_i2v_a14b_720p"
     prompt: "An astronaut hatching from an egg, on the surface of the moon, the darkness and depth of space realised in the background. High quality, ultrarealistic detail and breath-taking movie-like camera shot."
     task: "image-to-video"
     params:
       image_path: "figs/astronaut.jpg"
       negative_prompt: "Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards"
       num_frames: 81
+      height: 720
+      width: 1280
+      num_inference_steps: 50
       guidance_scale: 5.0
-      height: 700
-      width: 1280
-
-  # ------------------------------ Wan 2.1 T2V-1.3B (T2V) ---------------------------
-  - id: "wan21_1.3b_t2v"
-    prompt: "A serene mountain landscape with flowing clouds, cinematic drone shot, golden hour lighting"
-    task: "text-to-video"
-    params:
-      num_frames: 81
-      height: 480
-      width: 832
-      num_inference_steps: 30
-
-  # ------------------------------ Wan 2.1 T2V-14B (T2V) ----------------------------
-  - id: "wan21_14b_t2v"
-    prompt: "A detailed cinematic shot of a lion walking through a savannah at sunset, majestic, 8k"
-    task: "text-to-video"
-    params:
-      num_frames: 81
-      height: 700
-      width: 1280
-      num_inference_steps: 30
-
-  # ------------------------------ Wan 2.2 I2V-14B (I2V) ----------------------------
-  - id: "wan22_14b_i2v"
-    prompt: "A cyberpunk street scene coming to life, neon lights flickering, rain falling, detailed"
-    task: "image-to-video"
-    params:
-      image_path: "figs/cyberpunk_city.jpg"
-      num_frames: 81
-      height: 700
-      width: 1280
-      num_inference_steps: 30
 
   # ------------------------------ Flux 2/1 (T2I) -----------------------------------
   - id: "flux2_t2i"
     prompt: "A futuristic cyberpunk city at night, neon lights reflecting on wet streets, highly detailed, 8k"
     task: "text-to-image"
     params:
-      height: 1024
-      width: 1024
       guidance_scale: 4.0
       aspect_ratio: "1:1"
 
@@ -149,8 +145,6 @@ cases:
     prompt: "Transform into anime style"
     task: "image-to-image"
     params:
-      height: 1024
-      width: 1024
       image_path: "figs/cat.png"
 
   # ------------------------------ Z-Image Turbo (T2I) ------------------------------
@@ -158,7 +152,5 @@ cases:
     prompt: "A fantasy landscape with mountains and a river, detailed, vibrant colors"
     task: "text-to-image"
     params:
-      height: 1024
-      width: 1024
       num_inference_steps: 9
       guidance_scale: 0.0

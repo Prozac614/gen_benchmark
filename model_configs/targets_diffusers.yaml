@@ -32,28 +32,49 @@ targets:
     params:
       model: "Tongyi-MAI/Z-Image-Turbo"
 
-  diffusers_wan22_t2v_5b:
-    engine_class: "DiffusersEngine"
-    type: "local"
-    task: "text-to-video"
-    case_ids: ["wan22_5b_t2v"]
-    params:
-      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
-
-  diffusers_wan22_i2v_5b:
+  # -----------------------------------------------------------------------------
+  # Wan 2.2 TI2V-5B
+  # -----------------------------------------------------------------------------
+  diffusers_wan22_ti2v_5b_i2v_480p:
     engine_class: "DiffusersEngine"
     type: "local"
     task: "image-to-video"
-    case_ids: ["wan22_5b_i2v"]
+    case_ids: ["wan22_ti2v_5b_i2v_480p"]
     params:
-      # NOTE: Wan2.2 I2V uses A14B in official Diffusers repos.
-      model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
+      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
 
+  diffusers_wan22_ti2v_5b_i2v_720p:
+    engine_class: "DiffusersEngine"
+    type: "local"
+    task: "image-to-video"
+    case_ids: ["wan22_ti2v_5b_i2v_720p"]
+    params:
+      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
+
+  diffusers_wan22_ti2v_5b_t2v_480p:
+    engine_class: "DiffusersEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_ti2v_5b_t2v_480p"]
+    params:
+      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
+
+  diffusers_wan22_ti2v_5b_t2v_720p:
+    engine_class: "DiffusersEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_ti2v_5b_t2v_720p"]
+    params:
+      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
+
+  # -----------------------------------------------------------------------------
+  # Wan 2.2 T2V-A14B
+  # -----------------------------------------------------------------------------
   diffusers_wan22_t2v_a14b_480p:
     engine_class: "DiffusersEngine"
     type: "local"
     task: "text-to-video"
-    case_ids: ["wan22_a14b_t2v_480p"]
+    case_ids: ["wan22_t2v_a14b_480p"]
     params:
       model: "Wan-AI/Wan2.2-T2V-A14B-Diffusers"
 
@@ -65,11 +86,14 @@ targets:
     params:
       model: "Wan-AI/Wan2.2-T2V-A14B-Diffusers"
 
+  # -----------------------------------------------------------------------------
+  # Wan 2.2 I2V-A14B
+  # -----------------------------------------------------------------------------
   diffusers_wan22_i2v_a14b_480p:
     engine_class: "DiffusersEngine"
     type: "local"
     task: "image-to-video"
-    case_ids: ["wan22_a14b_i2v_480p"]
+    case_ids: ["wan22_i2v_a14b_480p"]
     params:
       model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
 
@@ -77,6 +101,6 @@ targets:
     engine_class: "DiffusersEngine"
     type: "local"
     task: "image-to-video"
-    case_ids: ["wan22_a14b_i2v_720p"]
+    case_ids: ["wan22_i2v_a14b_720p"]
     params:
       model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"

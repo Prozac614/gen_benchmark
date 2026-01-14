@@ -9,6 +9,98 @@ targets:
       env:
         DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
         
+  vllm_omni_qwen_edit_2511:
+    engine_class: "VllmOmniEngine"
+    type: "local"
+    task: "image-to-image"
+    case_ids: ["qwen_2511_edit"]
+    params:
+      model: "Qwen/Qwen-Image-Edit-2511"
+      env:
+        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+
+  vllm_omni_zimage: 
+    engine_class: "VllmOmniEngine"
+    type: "local"
+    task: "text-to-image"
+    case_ids: ["zimage_turbo_t2i"]
+    params:
+      model: "Tongyi-MAI/Z-Image-Turbo"
+      env:
+        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+
+  # -----------------------------------------------------------------------------
+  # Wan 2.2 TI2V-5B
+  # -----------------------------------------------------------------------------
+  vllm_omni_wan22_ti2v_5b_i2v_480p:
+    engine_class: "VllmOmniEngine"
+    type: "local"
+    task: "image-to-video"
+    case_ids: ["wan22_ti2v_5b_i2v_480p"]
+    params:
+      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
+      env:
+        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+  
+  vllm_omni_wan22_ti2v_5b_i2v_720p:
+    engine_class: "VllmOmniEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_ti2v_5b_i2v_720p"]
+    params:
+      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
+      env:
+        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+
+  # -----------------------------------------------------------------------------
+  # Wan 2.2 T2V-A14B
+  # -----------------------------------------------------------------------------
+  vllm_omni_wan22_t2v_a14b_480p:
+    engine_class: "VllmOmniEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_t2v_a14b_480p"]
+    params:
+      model: "Wan-AI/Wan2.2-T2V-A14B-Diffusers"
+      env:
+        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+
+  vllm_omni_wan22_t2v_a14b_720p:
+    engine_class: "VllmOmniEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_t2v_a14b_720p"]
+    params:
+      model: "Wan-AI/Wan2.2-T2V-A14B-Diffusers"
+      env:
+        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+
+  # -----------------------------------------------------------------------------
+  # Wan 2.2 I2V-A14B
+  # -----------------------------------------------------------------------------
+  vllm_omni_wan22_i2v_a14b_480p:
+    engine_class: "VllmOmniEngine"
+    type: "local"
+    task: "image-to-video"
+    case_ids: ["wan22_i2v_a14b_480p"]
+    params:
+      model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
+      env:
+        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+  
+  vllm_omni_wan22_i2v_a14b_720p:
+    engine_class: "VllmOmniEngine"
+    type: "local"
+    task: "image-to-video"
+    case_ids: ["wan22_i2v_a14b_720p"]
+    params:
+      model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
+      env:
+        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+  
+  # -----------------------------------------------------------------------------
+  # Cache-DiT
+  # -----------------------------------------------------------------------------
   vllm_omni_qwen_2512_cachedit:
     engine_class: "VllmOmniEngine"
     type: "local"
@@ -16,9 +108,7 @@ targets:
     case_ids: ["qwen_2512_t2i"]
     params:
       model: "Qwen/Qwen-Image-2512"
-      cache_backend: "cache_dit" # or "tea_cache"
-      # Align Cache-DiT parameters with SGLang defaults:
-      # FN=1, BN=0, warmup=4, rdt=0.24, mc=3, taylorseer=false, order=1, scm_policy=dynamic
+      cache_backend: "cache_dit"
       cache_config:
         Fn_compute_blocks: 1
         Bn_compute_blocks: 0
@@ -31,16 +121,7 @@ targets:
         scm_steps_policy: "dynamic"
       env:
         DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
-
-  vllm_omni_qwen_edit_2511:
-    engine_class: "VllmOmniEngine"
-    type: "local"
-    task: "image-to-image"
-    case_ids: ["qwen_2511_edit"]
-    params:
-      model: "Qwen/Qwen-Image-Edit-2511"
-      env:
-        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+ 
   vllm_omni_qwen_edit_2511_cachedit:
     engine_class: "VllmOmniEngine"
     type: "local"
@@ -61,79 +142,96 @@ targets:
         scm_steps_policy: "dynamic"
       env:
         DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
-
-  vllm_omni_zimage: 
-    engine_class: "VllmOmniEngine"
-    type: "local"
-    task: "text-to-image"
-    case_ids: ["zimage_turbo_t2i"]
-    params:
-      model: "Tongyi-MAI/Z-Image-Turbo"
-      env:
-        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
-  vllm_omni_zimage_cachedit:
-    engine_class: "VllmOmniEngine"
-    type: "local"
-    task: "text-to-image"
-    case_ids: ["zimage_turbo_t2i"]
-    params:
-      model: "Tongyi-MAI/Z-Image-Turbo"
-      cache_backend: "cache_dit"
-      cache_config:
-        Fn_compute_blocks: 1
-        Bn_compute_blocks: 0
-        max_warmup_steps: 4
-        residual_diff_threshold: 0.24
-        max_continuous_cached_steps: 3
-        enable_taylorseer: false
-        taylorseer_order: 1
-        scm_steps_mask_policy: null
-        scm_steps_policy: "dynamic"
-      env:
-        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
-
-  vllm_omni_wan22_ti2v_5b:
-    engine_class: "VllmOmniEngine"
-    type: "local"
-    task: "text-to-video" # Hybrid model, can do both
-    params:
-      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
-      env:
-        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
-        
-  vllm_omni_wan22_ti2v_5b_cachedit:
-    engine_class: "VllmOmniEngine"
-    type: "local"
-    task: "text-to-video"
-    params:
-      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
-      cache_backend: "cache_dit"
-      cache_config:
-        Fn_compute_blocks: 1
-        Bn_compute_blocks: 0
-        max_warmup_steps: 4
-        residual_diff_threshold: 0.24
-        max_continuous_cached_steps: 3
-        enable_taylorseer: false
-        taylorseer_order: 1
-        scm_steps_mask_policy: null
-        scm_steps_policy: "dynamic"
-      env:
-        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
-
-  vllm_omni_wan22_i2v_5b:
-    engine_class: "VllmOmniEngine"
-    type: "local"
-    task: "image-to-video"
-    params:
-      model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
-      env:
-        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
   
-  vllm_omni_wan22_i2v_5b_cachedit:
+  vllm_omni_wan22_ti2v_5b_i2v_480p_cachedit:
     engine_class: "VllmOmniEngine"
     type: "local"
     task: "image-to-video"
+    case_ids: ["wan22_ti2v_5b_i2v_480p"]
+    params:
+      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
+      cache_backend: "cache_dit"
+      cache_config:
+        Fn_compute_blocks: 1
+        Bn_compute_blocks: 0
+        max_warmup_steps: 4
+        residual_diff_threshold: 0.24
+        max_continuous_cached_steps: 3
+        enable_taylorseer: false
+        taylorseer_order: 1
+        scm_steps_mask_policy: null
+        scm_steps_policy: "dynamic"
+      env:
+        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+
+  vllm_omni_wan22_ti2v_5b_i2v_720p_cachedit:
+    engine_class: "VllmOmniEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_ti2v_5b_i2v_720p"]
+    params:
+      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
+      cache_backend: "cache_dit"
+      cache_config:
+        Fn_compute_blocks: 1
+        Bn_compute_blocks: 0
+        max_warmup_steps: 4
+        residual_diff_threshold: 0.24
+        max_continuous_cached_steps: 3
+        enable_taylorseer: false
+        taylorseer_order: 1
+        scm_steps_mask_policy: null
+        scm_steps_policy: "dynamic"
+      env:
+        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+
+  vllm_omni_wan22_t2v_a14b_480p_cachedit:
+    engine_class: "VllmOmniEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_t2v_a14b_480p"]
+    params:
+      model: "Wan-AI/Wan2.2-T2V-A14B-Diffusers"
+      cache_backend: "cache_dit"
+      cache_config:
+        Fn_compute_blocks: 1
+        Bn_compute_blocks: 0
+        max_warmup_steps: 4
+        residual_diff_threshold: 0.24
+        max_continuous_cached_steps: 3
+        enable_taylorseer: false
+        taylorseer_order: 1
+        scm_steps_mask_policy: null
+        scm_steps_policy: "dynamic"
+      env:
+        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+
+  vllm_omni_wan22_t2v_a14b_720p_cachedit:
+    engine_class: "VllmOmniEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_t2v_a14b_720p"]
+    params:
+      model: "Wan-AI/Wan2.2-T2V-A14B-Diffusers"
+      cache_backend: "cache_dit"
+      cache_config:
+        Fn_compute_blocks: 1
+        Bn_compute_blocks: 0
+        max_warmup_steps: 4
+        residual_diff_threshold: 0.24
+        max_continuous_cached_steps: 3
+        enable_taylorseer: false
+        taylorseer_order: 1
+        scm_steps_mask_policy: null
+        scm_steps_policy: "dynamic"
+      env:
+        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+
+  vllm_omni_wan22_i2v_a14b_480p_cachedit:
+    engine_class: "VllmOmniEngine"
+    type: "local"
+    task: "image-to-video"
+    case_ids: ["wan22_i2v_a14b_480p"]
     params:
       model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
       cache_backend: "cache_dit"
@@ -150,43 +248,23 @@ targets:
       env:
         DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
 
-  vllm_omni_wan22_t2v_a14b_480p:
-    engine_class: "VllmOmniEngine"
-    type: "local"
-    task: "text-to-video"
-    case_ids: ["wan22_a14b_t2v_480p"]
-    params:
-      model: "Wan-AI/Wan2.2-T2V-A14B"
-      env:
-        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
-
-  vllm_omni_wan22_t2v_a14b_720p:
-    engine_class: "VllmOmniEngine"
-    type: "local"
-    task: "text-to-video"
-    case_ids: ["wan22_a14b_t2v_720p"]
-    params:
-      model: "Wan-AI/Wan2.2-T2V-A14B"
-      env:
-        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
-
-  vllm_omni_wan22_i2v_a14b_480p:
+  vllm_omni_wan22_i2v_a14b_720p_cachedit:
     engine_class: "VllmOmniEngine"
     type: "local"
     task: "image-to-video"
-    case_ids: ["wan22_a14b_i2v_480p"]
+    case_ids: ["wan22_i2v_a14b_720p"]
     params:
       model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
+      cache_backend: "cache_dit"
+      cache_config:
+        Fn_compute_blocks: 1
+        Bn_compute_blocks: 0
+        max_warmup_steps: 4
+        residual_diff_threshold: 0.24
+        max_continuous_cached_steps: 3
+        enable_taylorseer: false
+        taylorseer_order: 1
+        scm_steps_mask_policy: null
+        scm_steps_policy: "dynamic"
       env:
         DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
-
-  vllm_omni_wan22_i2v_a14b_720p:
-    engine_class: "VllmOmniEngine"
-    type: "local"
-    task: "image-to-video"
-    case_ids: ["wan22_a14b_i2v_720p"]
-    params:
-      model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
-      env:
-        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
-        

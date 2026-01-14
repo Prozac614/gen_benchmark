@@ -5,7 +5,6 @@ targets:
     task: "text-to-image"
     case_ids: ["qwen_2512_t2i"]
     params:
-      # Use snapshots/current to auto-pick the newest snapshot under HF cache.
       model_path: "/workspace/hf_cache/hub/models--Qwen--Qwen-Image-2512/snapshots/current"
       model_cls: "qwen_image"
       task: "t2i"
@@ -17,33 +16,54 @@ targets:
     task: "image-to-image"
     case_ids: ["qwen_2511_edit"]
     params:
-      # Use snapshots/current to auto-pick the newest snapshot under HF cache.
       model_path: "/workspace/hf_cache/hub/models--Qwen--Qwen-Image-Edit-2511/snapshots/current"
       model_cls: "qwen_image"
       task: "i2i"
       config_json: "../LightX2V/configs/qwen_image/qwen_image_i2i_2511.json"
-  
-  lightx2v_wan22_i2v_5b:
+
+  # -----------------------------------------------------------------------------
+  # Wan 2.2 TI2V-5B
+  # -----------------------------------------------------------------------------
+  lightx2v_wan22_ti2v_5b_i2v:
     engine_class: "LightX2VEngine"
     type: "local"
     task: "image-to-video"
     case_ids: ["wan22_5b_i2v"]
     params:
-      # NOT the Diffusers repo variant. Use: Wan-AI/Wan2.2-TI2V-5B
       model_path: "/workspace/hf_cache/hub/models--Wan-AI--Wan2.2-TI2V-5B/snapshots/current"
       model_cls: "wan2.2"
       task: "i2v"
       config_json: "../LightX2V/configs/wan22/wan_ti2v_i2v.json"
 
-  lightx2v_wan22_t2v_5b:
+  lightx2v_wan22_ti2v_5b_i2v_720p:
+    engine_class: "LightX2VEngine"
+    type: "local"
+    task: "image-to-video"
+    case_ids: ["wan22_5b_i2v_720p"]
+    params:
+      model_path: "/workspace/hf_cache/hub/models--Wan-AI--Wan2.2-TI2V-5B/snapshots/current"
+      model_cls: "wan2.2"
+      task: "i2v"
+      config_json: "../LightX2V/configs/wan22/wan_ti2v_i2v.json"
+
+  lightx2v_wan22_ti2v_5b_t2v:
     engine_class: "LightX2VEngine"
     type: "local"
     task: "text-to-video"
     case_ids: ["wan22_5b_t2v"]
     params:
-      # NOT the Diffusers repo variant. Use: Wan-AI/Wan2.2-TI2V-5B
       model_path: "/workspace/hf_cache/hub/models--Wan-AI--Wan2.2-TI2V-5B/snapshots/current"
       model_cls: "wan2.2"
       task: "t2v"
       config_json: "../LightX2V/configs/wan22/wan_ti2v_t2v.json"
 
+  lightx2v_wan22_ti2v_5b_t2v_720p:
+    engine_class: "LightX2VEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_5b_t2v_720p"]
+    params:
+      model_path: "/workspace/hf_cache/hub/models--Wan-AI--Wan2.2-TI2V-5B/snapshots/current"
+      model_cls: "wan2.2"
+      task: "t2v"
+      config_json: "../LightX2V/configs/wan22/wan_ti2v_t2v.json"
