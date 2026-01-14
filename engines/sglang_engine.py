@@ -8,6 +8,7 @@ import tempfile
 import shutil
 import json
 import shlex
+import subprocess
 
 from sglang.multimodal_gen import DiffGenerator
 from .base import BaseEngine    
@@ -20,6 +21,7 @@ class SGLangEngine(BaseEngine):
         self.model = self.params["model"]
         self.num_gpus = self.params.get("num_gpus", 1)
         self.server_args = self.params.get("server_args") or {}
+        self._pending_cli_verify = None
 
     def load(self) -> None:
         if self.generator is None:
@@ -37,18 +39,59 @@ class SGLangEngine(BaseEngine):
         def q(v: Any) -> str:
             return shlex.quote(str(v))
 
+        def dq(v: Any) -> str:
+            s = str(v)
+            s = s.replace("\\", "\\\\").replace('"', '\\"')
+            return f"\"{s}\""
+
         env_vars = self.params.get("env", {}) or {}
         env_prefix = " ".join(f"{k}={q(v)}" for k, v in env_vars.items())
 
         cmd: list[str] = ["sglang", "generate", f"--model-path={self.model}"]
 
-        # Common server args knobs (best-effort, omit unknown to avoid misleading commands)
         server_args = dict(self.server_args or {})
         for k in ("log_level", "warmup", "dit_layerwise_offload"):
             if k in server_args:
                 cmd.append(f"--{k.replace('_','-')}={server_args[k]}")
 
         # Sampling args
+        if "prompt" in sampling_params:
+            cmd.append(f"--prompt={dq(sampling_params['prompt'])}")
+        if "negative_prompt" in sampling_params:
+            cmd.append(f"--negative-prompt={dq(sampling_params['negative_prompt'])}")
+        if "image_path" in sampling_params:
+            cmd.append(f"--image-path={q(sampling_params['image_path'])}")
+        if "width" in sampling_params:
+            cmd.append(f"--width={sampling_params['width']}")
+        if "height" in sampling_params:
+            cmd.append(f"--height={sampling_params['height']}")
+        if "num_inference_steps" in sampling_params:
+            cmd.append(f"--num-inference-steps={sampling_params['num_inference_steps']}")
+        if "num_frames" in sampling_params:
+            cmd.append(f"--num-frames={sampling_params['num_frames']}")
+        if "guidance_scale" in sampling_params:
+            cmd.append(f"--guidance-scale={sampling_params['guidance_scale']}")
+        if "seed" in sampling_params:
+            cmd.append(f"--seed={sampling_params['seed']}")
+
+        if sampling_params.get("save_output"):
+            cmd.append("--save-output")
+        if "output_path" in sampling_params:
+            cmd.append(f"--output-path={q(sampling_params['output_path'])}")
+
+        # Tokens are already safely formatted (numbers/bools or explicitly quoted),
+        # so just join for readability (avoid turning our double quotes into single-quoted tokens).
+        rendered = " ".join(str(x) for x in cmd)
+        return (env_prefix + " " + rendered).strip() if env_prefix else rendered
+
+    def _build_equivalent_cli_argv(self, *, sampling_params: Dict[str, Any]) -> list[str]:
+        cmd: list[str] = ["sglang", "generate", f"--model-path={self.model}"]
+
+        server_args = dict(self.server_args or {})
+        for k in ("log_level", "warmup", "dit_layerwise_offload"):
+            if k in server_args:
+                cmd.append(f"--{k.replace('_','-')}={server_args[k]}")
+
         if "prompt" in sampling_params:
             cmd.append(f"--prompt={sampling_params['prompt']}")
         if "negative_prompt" in sampling_params:
@@ -67,14 +110,11 @@ class SGLangEngine(BaseEngine):
             cmd.append(f"--guidance-scale={sampling_params['guidance_scale']}")
         if "seed" in sampling_params:
             cmd.append(f"--seed={sampling_params['seed']}")
-
         if sampling_params.get("save_output"):
             cmd.append("--save-output")
         if "output_path" in sampling_params:
             cmd.append(f"--output-path={sampling_params['output_path']}")
-
-        rendered = " ".join(q(x) for x in cmd)
-        return (env_prefix + " " + rendered).strip() if env_prefix else rendered
+        return cmd
 
     def _parse_sglang_metrics(self, perf_log_dir: str) -> Dict[str, Any]:
         log_file = os.path.join(perf_log_dir, "performance.log")
@@ -173,9 +213,13 @@ class SGLangEngine(BaseEngine):
 
         if bool(self.params.get("print_cli_command", True)):
             try:
-                print("\nEquivalent CLI command:")
+                green = "\033[32m"
+                reset = "\033[0m"
+                sep = f"{green}{'=' * 60}{reset}"
+                print("\n" + sep)
+                print(f"{green}Equivalent CLI command{reset}")
                 print(self._format_equivalent_cli(sampling_params=sampling_params))
-                print("")
+                print(sep + "\n")
             except Exception as e:
                 print(f"Warning: failed to format equivalent CLI command: {e}")
 
@@ -219,6 +263,33 @@ class SGLangEngine(BaseEngine):
             else:
                 avg_latency = statistics.mean(latencies)
 
+            # ------------------------------------------------------------------
+            # Post-run CLI verification (requested):
+            # DO NOT execute it here (the generator/worker is still alive and holds VRAM).
+            # Stash the command and run it in unload() after shutdown to avoid OOM.
+            # ------------------------------------------------------------------
+            if bool(self.params.get("verify_cli_command", True)):
+                verify_params = dict(sampling_params)
+                verify_out = os.path.join(output_dir, "__cli_verify")
+                os.makedirs(verify_out, exist_ok=True)
+                verify_params["output_path"] = verify_out
+                verify_params["save_output"] = True
+
+                cli_str = self._format_equivalent_cli(sampling_params=verify_params)
+                argv = self._build_equivalent_cli_argv(sampling_params=verify_params)
+
+                env = dict(os.environ)
+                for k, v in (self.params.get("env", {}) or {}).items():
+                    env[str(k)] = str(v)
+
+                self._pending_cli_verify = {
+                    "cli_str": cli_str,
+                    "argv": argv,
+                    "env": env,
+                    "verify_out": verify_out,
+                    "strict": bool(self.params.get("verify_cli_strict", False)),
+                }
+
             return {
                 "e2e_latency": avg_latency, 
                 "steady_state_seconds": avg_latency,
@@ -244,3 +315,23 @@ class SGLangEngine(BaseEngine):
         torch.cuda.empty_cache()
         
         time.sleep(5)
+
+        # Execute deferred CLI verification after shutdown to avoid GPU OOM.
+        if self._pending_cli_verify:
+            green = "\033[32m"
+            reset = "\033[0m"
+            sep = f"{green}{'=' * 100}{reset}"
+            try:
+                print("\n" + sep)
+                print(f"{green}CLI verify (after unload){reset}")
+                print(self._pending_cli_verify["cli_str"])
+                print(sep)
+                subprocess.run(self._pending_cli_verify["argv"], env=self._pending_cli_verify["env"], check=True)
+                print(f"{green}CLI verify: OK (output -> {self._pending_cli_verify['verify_out']}){reset}\n")
+            except Exception as e:
+                msg = f"CLI verify failed: {e}"
+                if self._pending_cli_verify.get("strict"):
+                    raise RuntimeError(msg) from e
+                print(f"Warning: {msg}")
+            finally:
+                self._pending_cli_verify = None

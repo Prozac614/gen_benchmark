@@ -56,7 +56,8 @@ cases:
       image_path: "figs/astronaut.jpg"
       negative_prompt: "Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards"
       num_frames: 81
-      height: 720
+      # NOTE: SGLang Wan pipeline only supports 1280x704 / 704x1280. Use 720p-class height=704 to avoid shape mismatch.
+      height: 704
       width: 1280
       num_inference_steps: 50
       guidance_scale: 5.0
@@ -81,7 +82,8 @@ cases:
       num_frames: 81
       guidance_scale: 5.0
       num_inference_steps: 50
-      height: 720
+      # NOTE: SGLang Wan pipeline only supports 1280x704 / 704x1280. Use 720p-class height=704 to avoid shape mismatch.
+      height: 704
       width: 1280
 
   # ------------------------------ Wan 2.2 T2V-A14B (480p / 720p) ------------------
@@ -104,7 +106,8 @@ cases:
       num_frames: 81
       guidance_scale: 5.0
       num_inference_steps: 50
-      height: 720
+      # NOTE: SGLang Wan pipeline only supports 1280x704 / 704x1280. Use 720p-class height=704 to avoid shape mismatch.
+      height: 704
       width: 1280
 
   # ------------------------------ Wan 2.2 I2V-A14B (480p / 720p) ------------------
@@ -127,7 +130,8 @@ cases:
       image_path: "figs/astronaut.jpg"
       negative_prompt: "Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards"
       num_frames: 81
-      height: 720
+      # NOTE: SGLang Wan pipeline only supports 1280x704 / 704x1280. Use 720p-class height=704 to avoid shape mismatch.
+      height: 704
       width: 1280
       num_inference_steps: 50
       guidance_scale: 5.0
