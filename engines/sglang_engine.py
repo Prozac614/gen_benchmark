@@ -80,6 +80,9 @@ class SGLangEngine(BaseEngine):
         if "output_path" in sampling_params:
             cmd.append(f"--output-path={q(sampling_params['output_path'])}")
 
+
+        print(f"command={shlex.join(cmd)}")
+
         # Tokens are already safely formatted (numbers/bools or explicitly quoted),
         # so just join for readability (avoid turning our double quotes into single-quoted tokens).
         rendered = " ".join(str(x) for x in cmd)
