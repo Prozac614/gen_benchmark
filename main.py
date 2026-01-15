@@ -426,6 +426,7 @@ def run_benchmark(config_path: str, target_names: Optional[List[str]] = None) ->
             pass
         print(f"{'='*60}")
         
+        engine = None
         try:
             # Instantiate engine
             EngineClass = get_engine_class(engine_class_name)
@@ -441,7 +442,6 @@ def run_benchmark(config_path: str, target_names: Optional[List[str]] = None) ->
             
             if not matching_cases:
                 print(f"  No matching cases for task type '{target_task}', skipping.")
-                engine.unload()
                 continue
             
             # Run each matching case
@@ -510,13 +510,18 @@ def run_benchmark(config_path: str, target_names: Optional[List[str]] = None) ->
                     print(f"    Peak VRAM: {result['peak_vram_mb']:.2f} MB")
                 print(f"    Output: {result['output_path']}")
             
-            # Unload model
-            print(f"\nUnloading engine: {target_name}")
-            engine.unload()
-            
         except Exception as e:
             print(f"ERROR: Failed to run {target_name}: {e}")
             raise  # Fast fail as per plan
+        finally:
+            # Always attempt to unload the engine to avoid leaked VRAM / stray workers,
+            # even when the target fails part-way through.
+            if engine is not None:
+                try:
+                    print(f"\nUnloading engine: {target_name}")
+                    engine.unload()
+                except Exception as unload_e:
+                    print(f"Warning: failed to unload engine {target_name}: {unload_e}")
     
     # Create results DataFrame
     df = pd.DataFrame(results)

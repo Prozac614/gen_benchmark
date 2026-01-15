@@ -29,28 +29,30 @@ targets:
       env:
         DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
 
-  # -----------------------------------------------------------------------------
-  # Wan 2.2 TI2V-5B
-  # -----------------------------------------------------------------------------
-  vllm_omni_wan22_ti2v_5b_i2v_480p:
-    engine_class: "VllmOmniEngine"
-    type: "local"
-    task: "image-to-video"
-    case_ids: ["wan22_ti2v_5b_i2v_480p"]
-    params:
-      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
-      env:
-        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+  # # -----------------------------------------------------------------------------
+  # # Wan 2.2 TI2V-5B
+  # # -----------------------------------------------------------------------------
+  # vllm_omni_wan22_ti2v_i2v_5b_480p:
+  #   engine_class: "VllmOmniEngine"
+  #   type: "local"
+  #   task: "image-to-video"
+  #   case_ids: ["wan22_ti2v_5b_i2v_480p"]
+  #   params:
+  #     model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
+  #     env:
+  #       DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+  #       ULYSSES_DEGREE: 4
   
-  vllm_omni_wan22_ti2v_5b_i2v_720p:
-    engine_class: "VllmOmniEngine"
-    type: "local"
-    task: "text-to-video"
-    case_ids: ["wan22_ti2v_5b_i2v_720p"]
-    params:
-      model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
-      env:
-        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+  # vllm_omni_wan22_ti2v_5b_t2v_720p:
+  #   engine_class: "VllmOmniEngine"
+  #   type: "local"
+  #   task: "text-to-video"
+  #   case_ids: ["wan22_ti2v_5b_t2v_720p"]
+  #   params:
+  #     model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
+  #     env:
+  #       DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+  #       ULYSSES_DEGREE: 4
 
   # -----------------------------------------------------------------------------
   # Wan 2.2 T2V-A14B
@@ -64,6 +66,8 @@ targets:
       model: "Wan-AI/Wan2.2-T2V-A14B-Diffusers"
       env:
         DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+        ULYSSES_DEGREE: 4
+        PYTORCH_CUDA_ALLOC_CONF: "expandable_segments:True"
 
   vllm_omni_wan22_t2v_a14b_720p:
     engine_class: "VllmOmniEngine"
@@ -74,6 +78,8 @@ targets:
       model: "Wan-AI/Wan2.2-T2V-A14B-Diffusers"
       env:
         DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+        ULYSSES_DEGREE: 4
+        PYTORCH_CUDA_ALLOC_CONF: "expandable_segments:True"
 
   # -----------------------------------------------------------------------------
   # Wan 2.2 I2V-A14B
@@ -97,6 +103,8 @@ targets:
       model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
       env:
         DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+        ULYSSES_DEGREE: 4
+        PYTORCH_CUDA_ALLOC_CONF: "expandable_segments:True"
   
   # -----------------------------------------------------------------------------
   # Cache-DiT
@@ -164,11 +172,11 @@ targets:
       env:
         DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
 
-  vllm_omni_wan22_ti2v_5b_i2v_720p_cachedit:
+  vllm_omni_wan22_ti2v_5b_t2v_720p_cachedit:
     engine_class: "VllmOmniEngine"
     type: "local"
     task: "text-to-video"
-    case_ids: ["wan22_ti2v_5b_i2v_720p"]
+    case_ids: ["wan22_ti2v_5b_t2v_720p"]
     params:
       model: "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
       cache_backend: "cache_dit"
@@ -184,6 +192,8 @@ targets:
         scm_steps_policy: "dynamic"
       env:
         DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+        ULYSSES_DEGREE: 4
+        PYTORCH_CUDA_ALLOC_CONF: "expandable_segments:True"
 
   vllm_omni_wan22_t2v_a14b_480p_cachedit:
     engine_class: "VllmOmniEngine"
@@ -226,45 +236,47 @@ targets:
         scm_steps_policy: "dynamic"
       env:
         DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+        ULYSSES_DEGREE: 4
+        PYTORCH_CUDA_ALLOC_CONF: "expandable_segments:True"
 
-  vllm_omni_wan22_i2v_a14b_480p_cachedit:
-    engine_class: "VllmOmniEngine"
-    type: "local"
-    task: "image-to-video"
-    case_ids: ["wan22_i2v_a14b_480p"]
-    params:
-      model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
-      cache_backend: "cache_dit"
-      cache_config:
-        Fn_compute_blocks: 1
-        Bn_compute_blocks: 0
-        max_warmup_steps: 4
-        residual_diff_threshold: 0.24
-        max_continuous_cached_steps: 3
-        enable_taylorseer: false
-        taylorseer_order: 1
-        scm_steps_mask_policy: null
-        scm_steps_policy: "dynamic"
-      env:
-        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+  # vllm_omni_wan22_i2v_a14b_480p_cachedit:
+  #   engine_class: "VllmOmniEngine"
+  #   type: "local"
+  #   task: "image-to-video"
+  #   case_ids: ["wan22_i2v_a14b_480p"]
+  #   params:
+  #     model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
+  #     cache_backend: "cache_dit"
+  #     cache_config:
+  #       Fn_compute_blocks: 1
+  #       Bn_compute_blocks: 0
+  #       max_warmup_steps: 4
+  #       residual_diff_threshold: 0.24
+  #       max_continuous_cached_steps: 3
+  #       enable_taylorseer: false
+  #       taylorseer_order: 1
+  #       scm_steps_mask_policy: null
+  #       scm_steps_policy: "dynamic"
+  #     env:
+  #       DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
 
-  vllm_omni_wan22_i2v_a14b_720p_cachedit:
-    engine_class: "VllmOmniEngine"
-    type: "local"
-    task: "image-to-video"
-    case_ids: ["wan22_i2v_a14b_720p"]
-    params:
-      model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
-      cache_backend: "cache_dit"
-      cache_config:
-        Fn_compute_blocks: 1
-        Bn_compute_blocks: 0
-        max_warmup_steps: 4
-        residual_diff_threshold: 0.24
-        max_continuous_cached_steps: 3
-        enable_taylorseer: false
-        taylorseer_order: 1
-        scm_steps_mask_policy: null
-        scm_steps_policy: "dynamic"
-      env:
-        DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"
+  # vllm_omni_wan22_i2v_a14b_720p_cachedit:
+  #   engine_class: "VllmOmniEngine"
+  #   type: "local"
+  #   task: "image-to-video"
+  #   case_ids: ["wan22_i2v_a14b_720p"]
+  #   params:
+  #     model: "Wan-AI/Wan2.2-I2V-A14B-Diffusers"
+  #     cache_backend: "cache_dit"
+  #     cache_config:
+  #       Fn_compute_blocks: 1
+  #       Bn_compute_blocks: 0
+  #       max_warmup_steps: 4
+  #       residual_diff_threshold: 0.24
+  #       max_continuous_cached_steps: 3
+  #       enable_taylorseer: false
+  #       taylorseer_order: 1
+  #       scm_steps_mask_policy: null
+  #       scm_steps_policy: "dynamic"
+  #     env:
+  #       DIFFUSION_ATTENTION_BACKEND: "FLASH_ATTN"

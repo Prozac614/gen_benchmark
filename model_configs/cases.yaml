@@ -137,7 +137,7 @@ cases:
       guidance_scale: 5.0
 
   # ------------------------------ Flux 2/1 (T2I) -----------------------------------
-  - id: "flux2_t2i"
+  - id: "flux_t2i"
     prompt: "A futuristic cyberpunk city at night, neon lights reflecting on wet streets, highly detailed, 8k"
     task: "text-to-image"
     params:
@@ -145,7 +145,7 @@ cases:
       aspect_ratio: "1:1"
 
   # ------------------------------ Flux 2 Edit (I2I) --------------------------------
-  - id: "flux2_edit"
+  - id: "flux_edit"
     prompt: "Transform into anime style"
     task: "image-to-image"
     params:
@@ -158,3 +158,16 @@ cases:
     params:
       num_inference_steps: 9
       guidance_scale: 0.0
+      aspect_ratio: "1:1"
+      height: 1024
+      width: 1024
+
+  - id: "zimage_turbo_i2i"
+    prompt: "A fantasy landscape with mountains and a river, detailed, vibrant colors"
+    task: "image-to-image"
+    params:
+      image_path: "figs/cat.png"
+      guidance_scale: 0.0
+      aspect_ratio: "1:1"
+      height: 1024
+      width: 1024

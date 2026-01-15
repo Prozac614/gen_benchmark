@@ -7,6 +7,7 @@ from typing import Dict, Any
 import hashlib
 import torch
 import gc
+import sys
 try:
     from loguru import logger
 except ImportError:
@@ -95,6 +96,12 @@ class LightX2VEngine(BaseEngine):
 
         if os.getenv("PROFILING_DEBUG_LEVEL") is None:
             os.environ["PROFILING_DEBUG_LEVEL"] = str(int(self.profiling_debug_level))
+
+        repo_path = self.params.get("lightx2v_repo_path") or os.getenv("LIGHTX2V_REPO_PATH")
+        if repo_path:
+            repo_path = os.path.abspath(repo_path)
+            if repo_path not in sys.path:
+                sys.path.insert(0, repo_path)
 
         from lightx2v import LightX2VPipeline 
         _patch_lightx2v_set_input_info_once()
@@ -480,6 +487,36 @@ class LightX2VEngine(BaseEngine):
                 if "aspect_ratio" in case_params:
                     ar = str(case_params["aspect_ratio"])
                     self.pipe.aspect_ratio = ar
+                    try:
+                        if getattr(self.pipe, "runner", None) is not None and str(self.model_cls or "") == "z_image":
+                            self.pipe.runner.config["aspect_ratio"] = ar
+                    except Exception:
+                        pass
+
+                try:
+                    if getattr(self.pipe, "runner", None) is not None and str(self.model_cls or "") == "z_image":
+                        h = None
+                        w = None
+                        cs = case_params.get("custom_shape")
+                        if isinstance(cs, (list, tuple)) and len(cs) == 2:
+                            try:
+                                h = int(cs[0])
+                                w = int(cs[1])
+                            except Exception:
+                                h = None
+                                w = None
+                        if (h is None or w is None) and "height" in case_params and "width" in case_params:
+                            try:
+                                h = int(case_params.get("height"))
+                                w = int(case_params.get("width"))
+                            except Exception:
+                                h = None
+                                w = None
+                        if isinstance(h, int) and isinstance(w, int) and h > 0 and w > 0:
+                            # ZImageRunner expects a comma-separated string like "H,W".
+                            self.pipe.runner.config["custom_shape"] = f"{h},{w}"
+                except Exception:
+                    pass
                 if str(self.model_cls or "") == "qwen_image":
                     # Force consistent H/W decision for Qwen (esp. i2i with aspect_ratio=1:1)
                     hw = _desired_hw_from_case()

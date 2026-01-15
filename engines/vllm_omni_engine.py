@@ -15,13 +15,9 @@ class VllmOmniEngine(BaseEngine):
     def _normalize_payload_to_frames(payload: Any) -> list[np.ndarray]:
         """
         Normalize vLLM-Omni diffusion payloads into a list of uint8 HWC RGB frames.
-        vLLM-Omni can return:
-        - PIL.Image.Image
-        - list[PIL.Image.Image]
-        - np.ndarray (HWC/CHW) or list[np.ndarray]
-        - torch.Tensor (CHW, HWC, TCHW, THWC)
-        - dict-like with keys such as frames/images/video
         """
+        if payload is None:
+            return []
 
         def _maybe_unwrap_dict(x: Any) -> Any:
             if isinstance(x, dict):
@@ -43,6 +39,8 @@ class VllmOmniEngine(BaseEngine):
             a = arr
             if not isinstance(a, np.ndarray):
                 a = np.asarray(a)
+            # Some backends may return batched frames like (B, T, H, W, C) or (B, H, W, C).
+            # This helper only normalizes a *single* frame, so callers should slice first.
             if a.ndim == 2:
                 a = np.stack([a, a, a], axis=-1)
             elif a.ndim == 3:
@@ -90,6 +88,14 @@ class VllmOmniEngine(BaseEngine):
             # If it's a stacked video tensor: THWC or TCHW
             if x.ndim == 4:
                 return [_to_uint8_hwc_rgb(x[i]) for i in range(int(x.shape[0]))]
+            # Some pipelines return batched video: (B, T, H, W, C) or (B, T, C, H, W)
+            if x.ndim == 5:
+                # Prefer first batch
+                xb = x[0]
+                # Now xb is (T, H, W, C) or (T, C, H, W)
+                if xb.ndim != 4:
+                    raise ValueError(f"Unexpected batched video shape: {x.shape}")
+                return [_to_uint8_hwc_rgb(xb[i]) for i in range(int(xb.shape[0]))]
             return [_to_uint8_hwc_rgb(x)]
         if isinstance(x, (list, tuple)):
             items = _flatten_one_level(list(x))

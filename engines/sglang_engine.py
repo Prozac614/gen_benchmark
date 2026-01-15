@@ -9,6 +9,7 @@ import shutil
 import json
 import shlex
 import subprocess
+import signal
 
 from sglang.multimodal_gen import DiffGenerator
 from .base import BaseEngine    
@@ -50,7 +51,7 @@ class SGLangEngine(BaseEngine):
         cmd: list[str] = ["sglang", "generate", f"--model-path={self.model}"]
 
         server_args = dict(self.server_args or {})
-        for k in ("log_level", "warmup", "dit_layerwise_offload"):
+        for k in ("log_level", "warmup", "dit_layerwise_offload", "ulysses_degree"):
             if k in server_args:
                 cmd.append(f"--{k.replace('_','-')}={server_args[k]}")
 
@@ -88,7 +89,7 @@ class SGLangEngine(BaseEngine):
         cmd: list[str] = ["sglang", "generate", f"--model-path={self.model}"]
 
         server_args = dict(self.server_args or {})
-        for k in ("log_level", "warmup", "dit_layerwise_offload"):
+        for k in ("log_level", "warmup", "dit_layerwise_offload", "ulysses_degree"):
             if k in server_args:
                 cmd.append(f"--{k.replace('_','-')}={server_args[k]}")
 
@@ -299,12 +300,7 @@ class SGLangEngine(BaseEngine):
             else:
                 avg_latency = statistics.mean(latencies)
 
-            # ------------------------------------------------------------------
-            # Post-run CLI verification (requested):
-            # DO NOT execute it here (the generator/worker is still alive and holds VRAM).
-            # Stash the command and run it in unload() after shutdown to avoid OOM.
-            # ------------------------------------------------------------------
-            if bool(self.params.get("verify_cli_command", True)):
+            if bool(self.params.get("verify_cli_command", False)):
                 verify_params = dict(sampling_params)
                 verify_out = os.path.join(output_dir, "__cli_verify")
                 os.makedirs(verify_out, exist_ok=True)
@@ -338,6 +334,94 @@ class SGLangEngine(BaseEngine):
 
 
     def unload(self) -> None:
+        def _ps_snapshot() -> list[tuple[int, int, str]]:
+            """
+            Return [(pid, ppid, cmd), ...] best-effort.
+            We intentionally avoid extra deps (psutil) since this repo is lightweight.
+            """
+            try:
+                out = subprocess.check_output(
+                    ["ps", "-eo", "pid=,ppid=,cmd="],
+                    text=True,
+                    stderr=subprocess.DEVNULL,
+                )
+            except Exception:
+                return []
+            rows: list[tuple[int, int, str]] = []
+            for line in out.splitlines():
+                line = line.strip()
+                if not line:
+                    continue
+                # pid ppid cmd...
+                parts = line.split(None, 2)
+                if len(parts) < 2:
+                    continue
+                try:
+                    pid = int(parts[0])
+                    ppid = int(parts[1])
+                except ValueError:
+                    continue
+                cmd = parts[2] if len(parts) >= 3 else ""
+                rows.append((pid, ppid, cmd))
+            return rows
+
+        def _descendants_of(root_pid: int) -> list[tuple[int, str]]:
+            rows = _ps_snapshot()
+            children: dict[int, list[tuple[int, str]]] = {}
+            for pid, ppid, cmd in rows:
+                children.setdefault(ppid, []).append((pid, cmd))
+
+            out: list[tuple[int, str]] = []
+            stack = [root_pid]
+            seen = {root_pid}
+            while stack:
+                cur = stack.pop()
+                for pid, cmd in children.get(cur, []):
+                    if pid in seen:
+                        continue
+                    seen.add(pid)
+                    out.append((pid, cmd))
+                    stack.append(pid)
+            return out
+
+        def _kill_pids(pids: list[int], sig: int) -> None:
+            for pid in pids:
+                try:
+                    os.kill(pid, sig)
+                except ProcessLookupError:
+                    pass
+                except Exception:
+                    # Best-effort; don't fail unload() because one pid is protected.
+                    pass
+
+        def _cleanup_leaked_sglang_children() -> None:
+            """
+            Best-effort cleanup:
+            - sglang local server often spawns worker/scheduler subprocesses.
+            - On exceptions, those can survive and keep VRAM allocated.
+            We only target descendants of *this* benchmark process and only those
+            that look sglang-related to avoid collateral damage.
+            """
+            me = os.getpid()
+            descendants = _descendants_of(me)
+            # Heuristic: match known sglang diffusion processes/commands.
+            suspect = [
+                pid
+                for pid, cmd in descendants
+                if ("sglang" in cmd)
+                or ("sgl-diffusion" in cmd)
+                or ("sglang-diffusion" in cmd)
+                or ("multimodal_gen" in cmd)
+                or ("launch_server" in cmd)
+            ]
+            if not suspect:
+                return
+
+            # Try graceful stop first, then force-kill.
+            _kill_pids(suspect, signal.SIGTERM)
+            time.sleep(1.0)
+            _kill_pids(suspect, signal.SIGKILL)
+
         if self.generator:
             try:
                 self.generator.shutdown()
@@ -348,15 +432,24 @@ class SGLangEngine(BaseEngine):
         
         import gc
         gc.collect()
+        try:
+            torch.cuda.synchronize()
+        except Exception:
+            pass
         torch.cuda.empty_cache()
         
         time.sleep(5)
+        # Extra safeguard: if shutdown() didn't fully reap subprocesses, kill leaked workers.
+        try:
+            _cleanup_leaked_sglang_children()
+        except Exception as e:
+            print(f"Warning: failed to cleanup leaked sglang subprocesses: {e}")
 
         # Execute deferred CLI verification after shutdown to avoid GPU OOM.
         if self._pending_cli_verify:
             green = "\033[32m"
             reset = "\033[0m"
-            sep = f"{green}{'=' * 100}{reset}"
+            sep = f"{green}{'=' * 60}{reset}"
             try:
                 print("\n" + sep)
                 print(f"{green}CLI verify {reset}")

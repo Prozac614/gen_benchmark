@@ -21,7 +21,7 @@ bash setup_env.sh /workspace
 Run all targets defined in a config file:
 
 ```bash
-export PYTORCH_ALLOC_CONF=expandable_segments:True
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 export CUDA_VISIBLE_DEVICES=1
 python main.py --config model_configs/all.yaml
 ```
@@ -29,7 +29,7 @@ python main.py --config model_configs/all.yaml
 Run specific targets:
 
 ```bash
-export PYTORCH_ALLOC_CONF=expandable_segments:True
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 export CUDA_VISIBLE_DEVICES=1
 python main.py --config model_configs/all.yaml --targets sglang_qwen_2512
 python main.py --config model_configs/all.yaml --targets lightx2v_qwen_2512
@@ -38,7 +38,8 @@ python main.py --config model_configs/all.yaml --targets diffusers_qwen_2512
 ```
 
 ```bash
-# Run only a single engine family
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+export CUDA_VISIBLE_DEVICES=1
 python main.py --config model_configs/sglang.yaml
 python main.py --config model_configs/lightx2v.yaml
 python main.py --config model_configs/vllm.yaml

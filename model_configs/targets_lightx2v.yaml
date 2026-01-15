@@ -21,16 +21,38 @@ targets:
       task: "i2i"
       config_json: "../LightX2V/configs/qwen_image/qwen_image_i2i_2511.json"
 
+  lightx2v_z_image_turbo:
+    engine_class: "LightX2VEngine"
+    type: "local"
+    task: "text-to-image"
+    case_ids: ["zimage_turbo_t2i"]
+    params:
+      model_path: "/workspace/hf_cache/hub/models--Tongyi-MAI--Z-Image-Turbo/snapshots/current"
+      model_cls: "z_image"
+      task: "t2i"
+      config_json: "../LightX2V/configs/z_image/z_image_turbo_t2i.json"
+
+  lightx2v_z_image_turbo_i2i:
+    engine_class: "LightX2VEngine"
+    type: "local"
+    task: "image-to-image"
+    case_ids: ["z_image_turbo_i2i"]
+    params:
+      model_path: "/workspace/hf_cache/hub/models--Tongyi-MAI--Z-Image-Turbo/snapshots/current"
+      model_cls: "z_image"
+      task: "i2i"
+      config_json: "../LightX2V/configs/z_image/z_image_turbo_i2i.json"
+
   # -----------------------------------------------------------------------------
   # Wan 2.2 TI2V-5B
   # -----------------------------------------------------------------------------
-  lightx2v_wan22_ti2v_5b_i2v:
+  lightx2v_wan22_ti2v_5b_i2v_480p:
     engine_class: "LightX2VEngine"
     type: "local"
     task: "image-to-video"
-    case_ids: ["wan22_5b_i2v"]
+    case_ids: ["wan22_5b_i2v_480p"]
     params:
-      model_path: "/workspace/hf_cache/hub/models--Wan-AI--Wan2.2-TI2V-5B/snapshots/current"
+      model_path: "/workspace/hf_cache/hub/models--Wan-AI--Wan2.2-TI2V-5B-Diffusers/snapshots/current"
       model_cls: "wan2.2"
       task: "i2v"
       config_json: "../LightX2V/configs/wan22/wan_ti2v_i2v.json"
@@ -41,18 +63,18 @@ targets:
     task: "image-to-video"
     case_ids: ["wan22_5b_i2v_720p"]
     params:
-      model_path: "/workspace/hf_cache/hub/models--Wan-AI--Wan2.2-TI2V-5B/snapshots/current"
+      model_path: "/workspace/hf_cache/hub/models--Wan-AI--Wan2.2-TI2V-5B-Diffusers/snapshots/current"
       model_cls: "wan2.2"
       task: "i2v"
       config_json: "../LightX2V/configs/wan22/wan_ti2v_i2v.json"
 
-  lightx2v_wan22_ti2v_5b_t2v:
+  lightx2v_wan22_ti2v_5b_t2v_480p:
     engine_class: "LightX2VEngine"
     type: "local"
     task: "text-to-video"
-    case_ids: ["wan22_5b_t2v"]
+    case_ids: ["wan22_5b_t2v_480p"]
     params:
-      model_path: "/workspace/hf_cache/hub/models--Wan-AI--Wan2.2-TI2V-5B/snapshots/current"
+      model_path: "/workspace/hf_cache/hub/models--Wan-AI--Wan2.2-TI2V-5B-Diffusers/snapshots/current"
       model_cls: "wan2.2"
       task: "t2v"
       config_json: "../LightX2V/configs/wan22/wan_ti2v_t2v.json"
@@ -63,7 +85,30 @@ targets:
     task: "text-to-video"
     case_ids: ["wan22_5b_t2v_720p"]
     params:
-      model_path: "/workspace/hf_cache/hub/models--Wan-AI--Wan2.2-TI2V-5B/snapshots/current"
+      model_path: "/workspace/hf_cache/hub/models--Wan-AI--Wan2.2-TI2V-5B-Diffusers/snapshots/current"
       model_cls: "wan2.2"
       task: "t2v"
       config_json: "../LightX2V/configs/wan22/wan_ti2v_t2v.json"
+      lightx2v_repo_path: "/workspace/LightX2V"
+
+  lightx2v_wan22_t2v_a14b_720p:
+    engine_class: "LightX2VEngine"
+    type: "local"
+    task: "text-to-video"
+    case_ids: ["wan22_t2v_a14b_720p"]
+    params:
+      model_path: "/workspace/hf_cache/hub/models--Wan-AI--Wan2.2-T2V-A14B-Diffusers/snapshots/current"
+      model_cls: "wan2.2"
+      task: "t2v"
+      config_json: "../LightX2V/configs/wan22/wan_ti2v_t2v.json"
+  
+  lightx2v_wan22_i2v_a14b_720p:
+    engine_class: "LightX2VEngine"
+    type: "local"
+    task: "image-to-video"
+    case_ids: ["wan22_i2v_a14b_720p"]
+    params:
+      model_path: "/workspace/hf_cache/hub/models--Wan-AI--Wan2.2-I2V-A14B-Diffusers/snapshots/current"
+      model_cls: "wan2.2"
+      task: "i2v"
+      config_json: "../LightX2V/configs/wan22/wan_ti2v_i2v.json"

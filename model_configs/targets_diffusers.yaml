@@ -15,14 +15,23 @@ targets:
     params:
       model: "Qwen/Qwen-Image-Edit-2511"
 
-  # diffusers_flux2:
-  #   engine_class: "DiffusersEngine"
-  #   type: "local"
-  #   task: "text-to-image"
-  #   case_ids: ["flux2_t2i"]
-  #   params:
-  #     model: "black-forest-labs/FLUX.2-dev"
-  #     cpu_offload: true
+  diffusers_flux1:
+    engine_class: "DiffusersEngine"
+    type: "local"
+    task: "text-to-image"
+    case_ids: ["flux_t2i"]
+    params:
+      model: "black-forest-labs/FLUX.1-dev"
+      cpu_offload: true
+  
+  diffusers_flux2:
+    engine_class: "DiffusersEngine"
+    type: "local"
+    task: "text-to-image"
+    case_ids: ["flux_t2i"]
+    params:
+      model: "black-forest-labs/FLUX.2-dev"
+      cpu_offload: true
 
   diffusers_zimage:
     engine_class: "DiffusersEngine"
@@ -82,7 +91,7 @@ targets:
     engine_class: "DiffusersEngine"
     type: "local"
     task: "text-to-video"
-    case_ids: ["wan22_a14b_t2v_720p"]
+    case_ids: ["wan22_t2v_a14b_720p"]
     params:
       model: "Wan-AI/Wan2.2-T2V-A14B-Diffusers"
 
